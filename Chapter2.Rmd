@@ -4,7 +4,10 @@
 ## ポワソン回帰でゼロ過剰が生じる例  
 例えば、森の中である一定距離歩いたときに見つかるニホンザルの数のデータを収集したところ、以下のデータ(`d_zipois`)が得られたとする。なお、`num_obs`は観察したサルの数を、`temp`はその日の気温を表す。  
 
-```{r, echo = FALSE}
+シミュレーションによって架空のデータを作成する。  
+```{r } 
+## データの作成  
+
 set.seed(1234)
 N <- 200
 temp <- rnorm(N, 10, 1.5)
@@ -21,12 +24,13 @@ dat_zipois <- data.frame(temp = temp,
            num_obs = num_obs)
 ```
 
+作成されたデータがこちら。  
 ```{r}
 dat_zipois
 ```
 <br/>  
 
-気温と観察されたサルの数の関係を調べたところ、以下のようになった。天気が高くなるほど、観察されるサルの数が多くなるように見える。
+気温と観察されたサルの数の関係を調べたところ、以下のようになった。気温が高くなるほど、観察されるサルの数が多くなるように見える。
 ```{r, fig.dim = c(4.5,3.5)}
 dat_zipois %>% 
   ggplot(aes(x = temp, y = num_obs))+
@@ -245,7 +249,7 @@ p_zipois_hist
 
 これは、普通のポワソンモデルの結果と比較すると明白である。なお、`num_obs_sim`は普通のポワソン分布を仮定したGLMで推定されたパラメータからシミュレートされたデータである。  
 
-```{r, echo = FALSE, fig.dim = c(7,4.5)}
+```{r, fig.dim = c(7,4.5)}
 data.frame(num_obs = num_obs,
            num_obs_zisim = num_obs_zisim,
            num_obs_sim = num_obs_sim) %>%    pivot_longer(cols = 1:3) %>% 

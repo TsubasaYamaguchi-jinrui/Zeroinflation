@@ -54,6 +54,14 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.1/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.27/datatables.js"></script>
+<link href="libs/dt-core-1.12.1/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.12.1/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.12.1/js/jquery.dataTables.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
 
 
 <style type="text/css">
@@ -214,19 +222,37 @@ div.csl-indent {
 <div id="ポワソン回帰でゼロ過剰が生じる例" class="section level2 hasAnchor" number="2.1">
 <h2><span class="header-section-number">2.1</span> ポワソン回帰でゼロ過剰が生じる例<a href="Chapter2.html#ポワソン回帰でゼロ過剰が生じる例" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>例えば、森の中である一定距離歩いたときに見つかるニホンザルの数のデータを収集したところ、以下のデータ(<code>d_zipois</code>)が得られたとする。なお、<code>num_obs</code>は観察したサルの数を、<code>temp</code>はその日の気温を表す。</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="Chapter2.html#cb14-1" aria-hidden="true" tabindex="-1"></a>dat_zipois</span></code></pre></div>
+<p>シミュレーションによって架空のデータを作成する。</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="Chapter2.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">## データの作成  </span></span>
+<span id="cb17-2"><a href="Chapter2.html#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="Chapter2.html#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb17-4"><a href="Chapter2.html#cb17-4" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb17-5"><a href="Chapter2.html#cb17-5" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N, <span class="dv">10</span>, <span class="fl">1.5</span>)</span>
+<span id="cb17-6"><a href="Chapter2.html#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="Chapter2.html#cb17-7" aria-hidden="true" tabindex="-1"></a>p_zi <span class="ot">&lt;-</span> <span class="fu">exp</span>((<span class="dv">7</span> <span class="sc">-</span> <span class="fl">0.8</span><span class="sc">*</span>temp))<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>((<span class="dv">7</span> <span class="sc">-</span> <span class="fl">0.8</span><span class="sc">*</span>temp)))</span>
+<span id="cb17-8"><a href="Chapter2.html#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="Chapter2.html#cb17-9" aria-hidden="true" tabindex="-1"></a>num_obs <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>,N)</span>
+<span id="cb17-10"><a href="Chapter2.html#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="Chapter2.html#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N){</span>
+<span id="cb17-12"><a href="Chapter2.html#cb17-12" aria-hidden="true" tabindex="-1"></a>  num_obs[i] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span><span class="sc">-</span>p_zi[i])<span class="sc">*</span><span class="fu">rpois</span>(<span class="dv">1</span>, <span class="at">lambda =</span> <span class="fu">exp</span>(<span class="fl">0.02</span> <span class="sc">+</span> <span class="fl">0.13</span><span class="sc">*</span>temp[i]))</span>
+<span id="cb17-13"><a href="Chapter2.html#cb17-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-14"><a href="Chapter2.html#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="Chapter2.html#cb17-15" aria-hidden="true" tabindex="-1"></a>dat_zipois <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">temp =</span> temp,</span>
+<span id="cb17-16"><a href="Chapter2.html#cb17-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">num_obs =</span> num_obs)</span></code></pre></div>
+<p>作成されたデータがこちら。</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="Chapter2.html#cb18-1" aria-hidden="true" tabindex="-1"></a>dat_zipois</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["temp"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["num_obs"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"8.189401","2":"2"},{"1":"10.416144","2":"5"},{"1":"11.626662","2":"3"},{"1":"6.481453","2":"0"},{"1":"10.643687","2":"3"},{"1":"10.759084","2":"6"},{"1":"9.137890","2":"0"},{"1":"9.180052","2":"0"},{"1":"9.153322","2":"5"},{"1":"8.664943","2":"0"},{"1":"9.284211","2":"0"},{"1":"8.502420","2":"0"},{"1":"8.835619","2":"0"},{"1":"10.096688","2":"3"},{"1":"11.439241","2":"3"},{"1":"9.834572","2":"5"},{"1":"9.233486","2":"6"},{"1":"8.633207","2":"0"},{"1":"8.744242","2":"0"},{"1":"13.623753","2":"6"},{"1":"10.201132","2":"0"},{"1":"9.263971","2":"0"},{"1":"9.339178","2":"0"},{"1":"10.689384","2":"0"},{"1":"8.959420","2":"0"},{"1":"7.827693","2":"0"},{"1":"10.862134","2":"0"},{"1":"8.464516","2":"4"},{"1":"9.977293","2":"4"},{"1":"8.596077","2":"1"},{"1":"11.653446","2":"7"},{"1":"9.286610","2":"3"},{"1":"8.935840","2":"2"},{"1":"9.248113","2":"3"},{"1":"7.556360","2":"0"},{"1":"8.248571","2":"0"},{"1":"6.729941","2":"0"},{"1":"7.988510","2":"0"},{"1":"9.558559","2":"3"},{"1":"9.301154","2":"0"},{"1":"12.174244","2":"5"},{"1":"8.397036","2":"2"},{"1":"8.716953","2":"0"},{"1":"9.579065","2":"0"},{"1":"8.508490","2":"1"},{"1":"8.547229","2":"4"},{"1":"8.339023","2":"2"},{"1":"8.122021","2":"2"},{"1":"9.214258","2":"0"},{"1":"9.254725","2":"0"},{"1":"7.290953","2":"0"},{"1":"9.126886","2":"0"},{"1":"8.336666","2":"5"},{"1":"8.477557","2":"5"},{"1":"9.756536","2":"5"},{"1":"10.844584","2":"8"},{"1":"12.471726","2":"6"},{"1":"8.839970","2":"5"},{"1":"12.408864","2":"2"},{"1":"8.263287","2":"2"},{"1":"10.984883","2":"3"},{"1":"13.823487","2":"10"},{"1":"9.947859","2":"5"},{"1":"8.995550","2":"1"},{"1":"9.988593","2":"2"},{"1":"12.665627","2":"6"},{"1":"8.292088","2":"0"},{"1":"12.051741","2":"11"},{"1":"11.994347","2":"6"},{"1":"10.504709","2":"4"},{"1":"10.010339","2":"4"},{"1":"9.316797","2":"0"},{"1":"9.450214","2":"0"},{"1":"10.972430","2":"7"},{"1":"13.105406","2":"0"},{"1":"9.769902","2":"2"},{"1":"7.913949","2":"1"},{"1":"8.914627","2":"0"},{"1":"10.387393","2":"1"},{"1":"9.524411","2":"5"},{"1":"9.733315","2":"9"},{"1":"9.745009","2":"6"},{"1":"7.941547","2":"0"},{"1":"9.739319","2":"0"},{"1":"11.275348","2":"1"},{"1":"11.046413","2":"6"},{"1":"10.824996","2":"5"},{"1":"9.395902","2":"3"},{"1":"9.712609","2":"3"},{"1":"8.208208","2":"0"},{"1":"9.920262","2":"0"},{"1":"10.382794","2":"3"},{"1":"12.558946","2":"4"},{"1":"11.502270","2":"9"},{"1":"9.256625","2":"0"},{"1":"10.533325","2":"0"},{"1":"8.298088","2":"0"},{"1":"11.317305","2":"5"},{"1":"11.459375","2":"5"},{"1":"13.181676","2":"3"},{"1":"10.621785","2":"2"},{"1":"9.287922","2":"4"},{"1":"10.098990","2":"3"},{"1":"9.246283","2":"0"},{"1":"8.761002","2":"0"},{"1":"10.250484","2":"5"},{"1":"8.655603","2":"0"},{"1":"10.252278","2":"0"},{"1":"10.532452","2":"5"},{"1":"9.921842","2":"0"},{"1":"9.706098","2":"0"},{"1":"9.026395","2":"0"},{"1":"8.335349","2":"0"},{"1":"11.273911","2":"8"},{"1":"10.033544","2":"4"},{"1":"11.246711","2":"0"},{"1":"8.133568","2":"0"},{"1":"10.253540","2":"0"},{"1":"11.009749","2":"6"},{"1":"9.960585","2":"3"},{"1":"9.712912","2":"2"},{"1":"8.827140","2":"6"},{"1":"13.087243","2":"5"},{"1":"11.125752","2":"7"},{"1":"12.736312","2":"7"},{"1":"10.120089","2":"5"},{"1":"9.052886","2":"0"},{"1":"7.730068","2":"0"},{"1":"9.045850","2":"0"},{"1":"10.339452","2":"7"},{"1":"11.520536","2":"8"},{"1":"10.379125","2":"0"},{"1":"8.242078","2":"0"},{"1":"11.003071","2":"3"},{"1":"7.524849","2":"0"},{"1":"9.451222","2":"6"},{"1":"9.525823","2":"2"},{"1":"7.077631","2":"4"},{"1":"11.380086","2":"7"},{"1":"9.065693","2":"7"},{"1":"9.498945","2":"1"},{"1":"12.092722","2":"4"},{"1":"10.955012","2":"3"},{"1":"9.837352","2":"0"},{"1":"10.770644","2":"4"},{"1":"10.598908","2":"0"},{"1":"12.494285","2":"5"},{"1":"10.413840","2":"1"},{"1":"10.759409","2":"4"},{"1":"10.521328","2":"5"},{"1":"9.434144","2":"4"},{"1":"10.146429","2":"3"},{"1":"12.458117","2":"3"},{"1":"8.686611","2":"0"},{"1":"10.182640","2":"4"},{"1":"12.043196","2":"10"},{"1":"9.648068","2":"0"},{"1":"8.419926","2":"0"},{"1":"8.695325","2":"0"},{"1":"9.414809","2":"0"},{"1":"8.728975","2":"1"},{"1":"9.609041","2":"0"},{"1":"9.378370","2":"8"},{"1":"9.725424","2":"3"},{"1":"10.610584","2":"9"},{"1":"10.936950","2":"0"},{"1":"12.517309","2":"5"},{"1":"9.896960","2":"5"},{"1":"9.518740","2":"5"},{"1":"12.206509","2":"0"},{"1":"12.556494","2":"2"},{"1":"10.064866","2":"2"},{"1":"9.501014","2":"0"},{"1":"7.266647","2":"0"},{"1":"12.116894","2":"6"},{"1":"8.743626","2":"4"},{"1":"8.314356","2":"0"},{"1":"14.565649","2":"10"},{"1":"10.352532","2":"7"},{"1":"9.950112","2":"4"},{"1":"5.901671","2":"0"},{"1":"9.850314","2":"4"},{"1":"11.464048","2":"5"},{"1":"10.620803","2":"0"},{"1":"11.368483","2":"3"},{"1":"12.975598","2":"8"},{"1":"11.753663","2":"2"},{"1":"9.236894","2":"0"},{"1":"11.056270","2":"3"},{"1":"9.702376","2":"3"},{"1":"9.192894","2":"0"},{"1":"5.716362","2":"0"},{"1":"8.815530","2":"4"},{"1":"10.731722","2":"0"},{"1":"13.252049","2":"3"},{"1":"10.751042","2":"2"},{"1":"10.930315","2":"4"},{"1":"8.551145","2":"2"},{"1":"10.243982","2":"6"},{"1":"6.882644","2":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p><br/></p>
-<p>気温と観察されたサルの数の関係を調べたところ、以下のようになった。天気が高くなるほど、観察されるサルの数が多くなるように見える。</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="Chapter2.html#cb15-1" aria-hidden="true" tabindex="-1"></a>dat_zipois <span class="sc">%&gt;%</span> </span>
-<span id="cb15-2"><a href="Chapter2.html#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">y =</span> num_obs))<span class="sc">+</span></span>
-<span id="cb15-3"><a href="Chapter2.html#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
-<span id="cb15-4"><a href="Chapter2.html#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
-<span id="cb15-5"><a href="Chapter2.html#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>)</span></code></pre></div>
+<p>気温と観察されたサルの数の関係を調べたところ、以下のようになった。気温が高くなるほど、観察されるサルの数が多くなるように見える。</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="Chapter2.html#cb19-1" aria-hidden="true" tabindex="-1"></a>dat_zipois <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="Chapter2.html#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">y =</span> num_obs))<span class="sc">+</span></span>
+<span id="cb19-3"><a href="Chapter2.html#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
+<span id="cb19-4"><a href="Chapter2.html#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
+<span id="cb19-5"><a href="Chapter2.html#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-15-1.png" width="432" style="display: block; margin: auto;" /></p>
 <p>そこで、以下のようなGLMを考え、気温が観察されるサルの数に与える影響を調べるとする。</p>
 <ul>
@@ -246,11 +272,11 @@ num\_obs_i &amp;\sim Poisson(\lambda_i)
 \end{aligned}
 \]</span></p>
 <p>RでのGLMのコードは以下のようになる。</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="Chapter2.html#cb16-1" aria-hidden="true" tabindex="-1"></a>r_pois <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="at">data =</span> dat_zipois,</span>
-<span id="cb16-2"><a href="Chapter2.html#cb16-2" aria-hidden="true" tabindex="-1"></a>              num_obs <span class="sc">~</span> temp,</span>
-<span id="cb16-3"><a href="Chapter2.html#cb16-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">family =</span> <span class="fu">poisson</span>(<span class="at">link=</span>log))</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="Chapter2.html#cb20-1" aria-hidden="true" tabindex="-1"></a>r_pois <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="at">data =</span> dat_zipois,</span>
+<span id="cb20-2"><a href="Chapter2.html#cb20-2" aria-hidden="true" tabindex="-1"></a>              num_obs <span class="sc">~</span> temp,</span>
+<span id="cb20-3"><a href="Chapter2.html#cb20-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">family =</span> <span class="fu">poisson</span>(<span class="at">link=</span>log))</span></code></pre></div>
 <p>結果は以下のようになり、<span class="math inline">\(\beta_0\)</span>の推定値は-2.385、<span class="math inline">\(\beta_1\)</span>の推定値は0.328である。</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="Chapter2.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(r_pois)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="Chapter2.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(r_pois)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## glm(formula = num_obs ~ temp, family = poisson(link = log), data = dat_zipois)
@@ -276,29 +302,29 @@ num\_obs_i &amp;\sim Poisson(\lambda_i)
 <p>つまり、観察されるサルの数は<span class="math inline">\(\lambda = e^{-2.385 + 0.328 \times temp_i}\)</span>を平均とするポワソン分布から得られると推定された。</p>
 <p>そこで、推定したパラメータを持つモデルの下で得られるデータをシミュレートし(<code>num_obs_sim</code>)、それを実際に得られたデータと比較してみる。</p>
 <p>下の図からわかるように、実際に得られたデータ(<code>num_obs</code>)では、<strong>推定されたモデルからシミュレートされたデータ</strong>(<code>num_obs_sim</code>)<strong>よりかなり0が多い</strong>ことが分かる。このようなとき、<strong>ゼロ過剰が生じている</strong>という。</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="Chapter2.html#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="do">## モデルの下で得られるデータをシミュレート  </span></span>
-<span id="cb19-2"><a href="Chapter2.html#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="Chapter2.html#cb19-3" aria-hidden="true" tabindex="-1"></a>num_obs_sim <span class="ot">&lt;-</span> <span class="fu">rpois</span>(N,</span>
-<span id="cb19-4"><a href="Chapter2.html#cb19-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lambda =</span> <span class="fu">exp</span>(<span class="fu">coef</span>(r_pois)[[<span class="dv">1</span>]])<span class="sc">+</span><span class="fu">coef</span>(r_pois)[[<span class="dv">2</span>]]<span class="sc">*</span>dat_zipois<span class="sc">$</span>temp)</span>
-<span id="cb19-5"><a href="Chapter2.html#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="Chapter2.html#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 実際のデータと比較  </span></span>
-<span id="cb19-7"><a href="Chapter2.html#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">num_obs =</span> num_obs,</span>
-<span id="cb19-8"><a href="Chapter2.html#cb19-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">num_obs_sim =</span> num_obs_sim) <span class="sc">%&gt;%</span></span>
-<span id="cb19-9"><a href="Chapter2.html#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-10"><a href="Chapter2.html#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value))<span class="sc">+</span></span>
-<span id="cb19-11"><a href="Chapter2.html#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">fill =</span> name),</span>
-<span id="cb19-12"><a href="Chapter2.html#cb19-12" aria-hidden="true" tabindex="-1"></a>                 <span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
-<span id="cb19-13"><a href="Chapter2.html#cb19-13" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">15</span>,<span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb19-14"><a href="Chapter2.html#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">13</span>)<span class="sc">+</span></span>
-<span id="cb19-15"><a href="Chapter2.html#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
-<span id="cb19-16"><a href="Chapter2.html#cb19-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>,<span class="at">vjust=</span><span class="fl">0.5</span>))<span class="sc">+</span></span>
-<span id="cb19-17"><a href="Chapter2.html#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;サルが観察された回数&quot;</span>,</span>
-<span id="cb19-18"><a href="Chapter2.html#cb19-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;度</span><span class="sc">\n</span><span class="st">数&quot;</span>) <span class="ot">-&gt;</span> p_pois_hist</span>
-<span id="cb19-19"><a href="Chapter2.html#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-20"><a href="Chapter2.html#cb19-20" aria-hidden="true" tabindex="-1"></a>p_pois_hist</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="Chapter2.html#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">## モデルの下で得られるデータをシミュレート  </span></span>
+<span id="cb23-2"><a href="Chapter2.html#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="Chapter2.html#cb23-3" aria-hidden="true" tabindex="-1"></a>num_obs_sim <span class="ot">&lt;-</span> <span class="fu">rpois</span>(N,</span>
+<span id="cb23-4"><a href="Chapter2.html#cb23-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lambda =</span> <span class="fu">exp</span>(<span class="fu">coef</span>(r_pois)[[<span class="dv">1</span>]])<span class="sc">+</span><span class="fu">coef</span>(r_pois)[[<span class="dv">2</span>]]<span class="sc">*</span>dat_zipois<span class="sc">$</span>temp)</span>
+<span id="cb23-5"><a href="Chapter2.html#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="Chapter2.html#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 実際のデータと比較  </span></span>
+<span id="cb23-7"><a href="Chapter2.html#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">num_obs =</span> num_obs,</span>
+<span id="cb23-8"><a href="Chapter2.html#cb23-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">num_obs_sim =</span> num_obs_sim) <span class="sc">%&gt;%</span></span>
+<span id="cb23-9"><a href="Chapter2.html#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-10"><a href="Chapter2.html#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value))<span class="sc">+</span></span>
+<span id="cb23-11"><a href="Chapter2.html#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">fill =</span> name),</span>
+<span id="cb23-12"><a href="Chapter2.html#cb23-12" aria-hidden="true" tabindex="-1"></a>                 <span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb23-13"><a href="Chapter2.html#cb23-13" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">15</span>,<span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb23-14"><a href="Chapter2.html#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">13</span>)<span class="sc">+</span></span>
+<span id="cb23-15"><a href="Chapter2.html#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
+<span id="cb23-16"><a href="Chapter2.html#cb23-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>,<span class="at">vjust=</span><span class="fl">0.5</span>))<span class="sc">+</span></span>
+<span id="cb23-17"><a href="Chapter2.html#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;サルが観察された回数&quot;</span>,</span>
+<span id="cb23-18"><a href="Chapter2.html#cb23-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;度</span><span class="sc">\n</span><span class="st">数&quot;</span>) <span class="ot">-&gt;</span> p_pois_hist</span>
+<span id="cb23-19"><a href="Chapter2.html#cb23-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-20"><a href="Chapter2.html#cb23-20" aria-hidden="true" tabindex="-1"></a>p_pois_hist</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>実際のデータに含まれる0の数と、モデルが正しいと仮定したときにシミュレーションで生成したデータに含まれる0の数を比較することで、ゼロ過剰が生じているかを検定することができる(詳細は<a href="https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html#formal-tests-for-zero-inflation">こちら</a>)。検定の結果、ゼロ過剰が検出された。</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="Chapter2.html#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">testZeroInflation</span>(r_pois)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="Chapter2.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">testZeroInflation</span>(r_pois)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-19-1.png" width="432" style="display: block; margin: auto;" /></p>
 <pre><code>## 
 ##  DHARMa zero-inflation test via comparison to expected zeros with
@@ -308,12 +334,12 @@ num\_obs_i &amp;\sim Poisson(\lambda_i)
 ## ratioObsSim = 3.069, p-value &lt; 2.2e-16
 ## alternative hypothesis: two.sided</code></pre>
 <p>Dispersion parameterを算出すると値が1を大きく超えており、過分散が生じていることが分かる。ゼロ過剰であることが原因だろう。</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="Chapter2.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">residuals</span>(r_pois,<span class="at">type =</span> <span class="st">&quot;pearson&quot;</span>)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>r_pois<span class="sc">$</span>df.residual</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="Chapter2.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">residuals</span>(r_pois,<span class="at">type =</span> <span class="st">&quot;pearson&quot;</span>)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>r_pois<span class="sc">$</span>df.residual</span></code></pre></div>
 <pre><code>## [1] 2.233114</code></pre>
 <p>過分散の検定をしても過分散が検出される。</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="Chapter2.html#cb24-1" aria-hidden="true" tabindex="-1"></a>resid_pois <span class="ot">&lt;-</span><span class="fu">simulateResiduals</span>(r_pois)</span>
-<span id="cb24-2"><a href="Chapter2.html#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="Chapter2.html#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">testDispersion</span>(resid_pois)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="Chapter2.html#cb28-1" aria-hidden="true" tabindex="-1"></a>resid_pois <span class="ot">&lt;-</span><span class="fu">simulateResiduals</span>(r_pois)</span>
+<span id="cb28-2"><a href="Chapter2.html#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="Chapter2.html#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">testDispersion</span>(resid_pois)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-21-1.png" width="432" style="display: block; margin: auto;" /></p>
 <pre><code>## 
 ##  DHARMa nonparametric dispersion test via sd of residuals fitted vs.
@@ -323,32 +349,32 @@ num\_obs_i &amp;\sim Poisson(\lambda_i)
 ## dispersion = 2.0984, p-value &lt; 2.2e-16
 ## alternative hypothesis: two.sided</code></pre>
 <p>Quantile residual(詳細は<a href="https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html#binomial-data">こちら</a>)についてQQplotを描画しても、データがモデルで仮定された分布と合致していないことが分かる。</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="Chapter2.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotQQunif</span>(resid_pois)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="Chapter2.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotQQunif</span>(resid_pois)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-22-1.png" width="432" style="display: block; margin: auto;" /></p>
 <p>このモデルの推定結果に基づく回帰曲線は以下のようになる。</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="Chapter2.html#cb27-1" aria-hidden="true" tabindex="-1"></a>fit_pois <span class="ot">&lt;-</span> <span class="fu">ggpredict</span>(r_pois,</span>
-<span id="cb27-2"><a href="Chapter2.html#cb27-2" aria-hidden="true" tabindex="-1"></a>          <span class="do">## 温度は5~15で0.1刻み</span></span>
-<span id="cb27-3"><a href="Chapter2.html#cb27-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">terms =</span> <span class="st">&quot;temp[5:15,by=0.1]&quot;</span>,</span>
-<span id="cb27-4"><a href="Chapter2.html#cb27-4" aria-hidden="true" tabindex="-1"></a>          <span class="do">## ここを変える</span></span>
-<span id="cb27-5"><a href="Chapter2.html#cb27-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">type =</span><span class="st">&quot;fixed&quot;</span>)</span>
-<span id="cb27-6"><a href="Chapter2.html#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="Chapter2.html#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat_zipois)<span class="sc">+</span></span>
-<span id="cb27-8"><a href="Chapter2.html#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">y =</span> num_obs),</span>
-<span id="cb27-9"><a href="Chapter2.html#cb27-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
-<span id="cb27-10"><a href="Chapter2.html#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="do">### 回帰曲線</span></span>
-<span id="cb27-11"><a href="Chapter2.html#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> fit_pois,</span>
-<span id="cb27-12"><a href="Chapter2.html#cb27-12" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted))<span class="sc">+</span></span>
-<span id="cb27-13"><a href="Chapter2.html#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 95%信頼区間</span></span>
-<span id="cb27-14"><a href="Chapter2.html#cb27-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> fit_pois,</span>
-<span id="cb27-15"><a href="Chapter2.html#cb27-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted,</span>
-<span id="cb27-16"><a href="Chapter2.html#cb27-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
-<span id="cb27-17"><a href="Chapter2.html#cb27-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
-<span id="cb27-18"><a href="Chapter2.html#cb27-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>)<span class="sc">+</span></span>
-<span id="cb27-19"><a href="Chapter2.html#cb27-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
-<span id="cb27-20"><a href="Chapter2.html#cb27-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> (<span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">17</span>)))<span class="sc">+</span></span>
-<span id="cb27-21"><a href="Chapter2.html#cb27-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;普通のポワソン回帰&quot;</span>)<span class="ot">-&gt;</span> p_pois</span>
-<span id="cb27-22"><a href="Chapter2.html#cb27-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-23"><a href="Chapter2.html#cb27-23" aria-hidden="true" tabindex="-1"></a>p_pois</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="Chapter2.html#cb31-1" aria-hidden="true" tabindex="-1"></a>fit_pois <span class="ot">&lt;-</span> <span class="fu">ggpredict</span>(r_pois,</span>
+<span id="cb31-2"><a href="Chapter2.html#cb31-2" aria-hidden="true" tabindex="-1"></a>          <span class="do">## 温度は5~15で0.1刻み</span></span>
+<span id="cb31-3"><a href="Chapter2.html#cb31-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">terms =</span> <span class="st">&quot;temp[5:15,by=0.1]&quot;</span>,</span>
+<span id="cb31-4"><a href="Chapter2.html#cb31-4" aria-hidden="true" tabindex="-1"></a>          <span class="do">## ここを変える</span></span>
+<span id="cb31-5"><a href="Chapter2.html#cb31-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">type =</span><span class="st">&quot;fixed&quot;</span>)</span>
+<span id="cb31-6"><a href="Chapter2.html#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="Chapter2.html#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat_zipois)<span class="sc">+</span></span>
+<span id="cb31-8"><a href="Chapter2.html#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">y =</span> num_obs),</span>
+<span id="cb31-9"><a href="Chapter2.html#cb31-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
+<span id="cb31-10"><a href="Chapter2.html#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="do">### 回帰曲線</span></span>
+<span id="cb31-11"><a href="Chapter2.html#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> fit_pois,</span>
+<span id="cb31-12"><a href="Chapter2.html#cb31-12" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted))<span class="sc">+</span></span>
+<span id="cb31-13"><a href="Chapter2.html#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 95%信頼区間</span></span>
+<span id="cb31-14"><a href="Chapter2.html#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> fit_pois,</span>
+<span id="cb31-15"><a href="Chapter2.html#cb31-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted,</span>
+<span id="cb31-16"><a href="Chapter2.html#cb31-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
+<span id="cb31-17"><a href="Chapter2.html#cb31-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
+<span id="cb31-18"><a href="Chapter2.html#cb31-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>)<span class="sc">+</span></span>
+<span id="cb31-19"><a href="Chapter2.html#cb31-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
+<span id="cb31-20"><a href="Chapter2.html#cb31-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> (<span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">17</span>)))<span class="sc">+</span></span>
+<span id="cb31-21"><a href="Chapter2.html#cb31-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;普通のポワソン回帰&quot;</span>)<span class="ot">-&gt;</span> p_pois</span>
+<span id="cb31-22"><a href="Chapter2.html#cb31-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-23"><a href="Chapter2.html#cb31-23" aria-hidden="true" tabindex="-1"></a>p_pois</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-23-1.png" width="432" style="display: block; margin: auto;" /></p>
 </div>
 <div id="対処法-ゼロ過剰ポワソンモデル" class="section level2 hasAnchor" number="2.2">
@@ -389,15 +415,15 @@ num\_obs_i &amp;\sim ZIPoisson(q_i, \lambda_i)
 \end{aligned}
 \]</span></p>
 <p>Rでは<code>glmmTMB</code>パッケージを用いて以下のようにパラメータを推定できる。<span class="math inline">\(q_i\)</span>が気温によらないと仮定する場合は、<code>ziformula ~ 1</code>とする。</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="Chapter2.html#cb28-1" aria-hidden="true" tabindex="-1"></a>r_zipois <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(<span class="at">data =</span> dat_zipois,</span>
-<span id="cb28-2"><a href="Chapter2.html#cb28-2" aria-hidden="true" tabindex="-1"></a>                    num_obs <span class="sc">~</span> temp,</span>
-<span id="cb28-3"><a href="Chapter2.html#cb28-3" aria-hidden="true" tabindex="-1"></a>          <span class="do">## 気温によらない場合は ziformula ~ 1</span></span>
-<span id="cb28-4"><a href="Chapter2.html#cb28-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ziformula =</span> <span class="sc">~</span>temp,</span>
-<span id="cb28-5"><a href="Chapter2.html#cb28-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family =</span> <span class="st">&quot;poisson&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="Chapter2.html#cb32-1" aria-hidden="true" tabindex="-1"></a>r_zipois <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(<span class="at">data =</span> dat_zipois,</span>
+<span id="cb32-2"><a href="Chapter2.html#cb32-2" aria-hidden="true" tabindex="-1"></a>                    num_obs <span class="sc">~</span> temp,</span>
+<span id="cb32-3"><a href="Chapter2.html#cb32-3" aria-hidden="true" tabindex="-1"></a>          <span class="do">## 気温によらない場合は ziformula ~ 1</span></span>
+<span id="cb32-4"><a href="Chapter2.html#cb32-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ziformula =</span> <span class="sc">~</span>temp,</span>
+<span id="cb32-5"><a href="Chapter2.html#cb32-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family =</span> <span class="st">&quot;poisson&quot;</span>)</span></code></pre></div>
 <p>モデルで推定されたパラメータは以下のようになる。</p>
 <p><code>Zero-inflation model:</code>というところにある推定結果が<span class="math inline">\(q_i\)</span>に関するパラメータの推定値であり、<span class="math inline">\(\beta_{10}\)</span>と<span class="math inline">\(\beta_{11}\)</span>の推定値はそれぞれ7.257、-0.805となる。</p>
 <p><code>Conditional model:</code>というところにある推定結果が<span class="math inline">\(\lambda_i\)</span>に関するパラメータの推定値であり、<span class="math inline">\(\beta_{20}\)</span>と<span class="math inline">\(\beta_{21}\)</span>の推定値はそれぞれ-0.086、0.146となる。</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="Chapter2.html#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(r_zipois)</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="Chapter2.html#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(r_zipois)</span></code></pre></div>
 <pre><code>##  Family: poisson  ( log )
 ## Formula:          num_obs ~ temp
 ## Zero inflation:           ~temp
@@ -421,33 +447,46 @@ num\_obs_i &amp;\sim ZIPoisson(q_i, \lambda_i)
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>推定したパラメータを持つゼロ過剰ポワソンモデルの下で得られるデータをシミュレートし(<code>num_obs_zisim</code>)、それを実際に得られたデータと比較してみる。</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="Chapter2.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 推定されたパラメータからデータをシミュレート</span></span>
-<span id="cb31-2"><a href="Chapter2.html#cb31-2" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span><span class="fu">exp</span>(<span class="sc">-</span>(<span class="fu">fixef</span>(r_zipois)[[<span class="dv">2</span>]][[<span class="dv">1</span>]] <span class="sc">+</span> <span class="fu">fixef</span>(r_zipois)[[<span class="dv">2</span>]][[<span class="dv">2</span>]]<span class="sc">*</span>dat_zipois<span class="sc">$</span>temp)))</span>
-<span id="cb31-3"><a href="Chapter2.html#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-4"><a href="Chapter2.html#cb31-4" aria-hidden="true" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> <span class="fu">exp</span>((<span class="fu">fixef</span>(r_zipois)[[<span class="dv">1</span>]][[<span class="dv">1</span>]] <span class="sc">+</span> <span class="fu">fixef</span>(r_zipois)[[<span class="dv">1</span>]][[<span class="dv">2</span>]]<span class="sc">*</span>dat_zipois<span class="sc">$</span>temp))</span>
-<span id="cb31-5"><a href="Chapter2.html#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-6"><a href="Chapter2.html#cb31-6" aria-hidden="true" tabindex="-1"></a>num_obs_zisim <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N,<span class="dv">1</span>,<span class="dv">1</span><span class="sc">-</span>q)<span class="sc">*</span><span class="fu">rpois</span>(N, lambda)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="Chapter2.html#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 推定されたパラメータからデータをシミュレート</span></span>
+<span id="cb35-2"><a href="Chapter2.html#cb35-2" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span><span class="fu">exp</span>(<span class="sc">-</span>(<span class="fu">fixef</span>(r_zipois)[[<span class="dv">2</span>]][[<span class="dv">1</span>]] <span class="sc">+</span> <span class="fu">fixef</span>(r_zipois)[[<span class="dv">2</span>]][[<span class="dv">2</span>]]<span class="sc">*</span>dat_zipois<span class="sc">$</span>temp)))</span>
+<span id="cb35-3"><a href="Chapter2.html#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="Chapter2.html#cb35-4" aria-hidden="true" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> <span class="fu">exp</span>((<span class="fu">fixef</span>(r_zipois)[[<span class="dv">1</span>]][[<span class="dv">1</span>]] <span class="sc">+</span> <span class="fu">fixef</span>(r_zipois)[[<span class="dv">1</span>]][[<span class="dv">2</span>]]<span class="sc">*</span>dat_zipois<span class="sc">$</span>temp))</span>
+<span id="cb35-5"><a href="Chapter2.html#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="Chapter2.html#cb35-6" aria-hidden="true" tabindex="-1"></a>num_obs_zisim <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N,<span class="dv">1</span>,<span class="dv">1</span><span class="sc">-</span>q)<span class="sc">*</span><span class="fu">rpois</span>(N, lambda)</span></code></pre></div>
 <p>下の図からわかるように、推定されたモデルからシミュレートされたデータ(<code>num_obs_zisim</code>)の分布は、実際のデータとかなりよくマッチしていることが分かる。</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="Chapter2.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 実際のデータと比較  </span></span>
-<span id="cb32-2"><a href="Chapter2.html#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">num_obs =</span> dat_zipois<span class="sc">$</span>num_obs,</span>
-<span id="cb32-3"><a href="Chapter2.html#cb32-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">num_obs_zisim =</span> num_obs_zisim) <span class="sc">%&gt;%</span></span>
-<span id="cb32-4"><a href="Chapter2.html#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb32-5"><a href="Chapter2.html#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value))<span class="sc">+</span></span>
-<span id="cb32-6"><a href="Chapter2.html#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">fill =</span> name),</span>
-<span id="cb32-7"><a href="Chapter2.html#cb32-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
-<span id="cb32-8"><a href="Chapter2.html#cb32-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">15</span>,<span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb32-9"><a href="Chapter2.html#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">13</span>)<span class="sc">+</span></span>
-<span id="cb32-10"><a href="Chapter2.html#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
-<span id="cb32-11"><a href="Chapter2.html#cb32-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>,<span class="at">vjust=</span><span class="fl">0.5</span>))<span class="sc">+</span></span>
-<span id="cb32-12"><a href="Chapter2.html#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;サルが観察された回数&quot;</span>,</span>
-<span id="cb32-13"><a href="Chapter2.html#cb32-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;度</span><span class="sc">\n</span><span class="st">数&quot;</span>) <span class="ot">-&gt;</span> p_zipois_hist</span>
-<span id="cb32-14"><a href="Chapter2.html#cb32-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-15"><a href="Chapter2.html#cb32-15" aria-hidden="true" tabindex="-1"></a>p_zipois_hist</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="Chapter2.html#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 実際のデータと比較  </span></span>
+<span id="cb36-2"><a href="Chapter2.html#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">num_obs =</span> dat_zipois<span class="sc">$</span>num_obs,</span>
+<span id="cb36-3"><a href="Chapter2.html#cb36-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">num_obs_zisim =</span> num_obs_zisim) <span class="sc">%&gt;%</span></span>
+<span id="cb36-4"><a href="Chapter2.html#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-5"><a href="Chapter2.html#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value))<span class="sc">+</span></span>
+<span id="cb36-6"><a href="Chapter2.html#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">fill =</span> name),</span>
+<span id="cb36-7"><a href="Chapter2.html#cb36-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb36-8"><a href="Chapter2.html#cb36-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">15</span>,<span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb36-9"><a href="Chapter2.html#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">13</span>)<span class="sc">+</span></span>
+<span id="cb36-10"><a href="Chapter2.html#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
+<span id="cb36-11"><a href="Chapter2.html#cb36-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>,<span class="at">vjust=</span><span class="fl">0.5</span>))<span class="sc">+</span></span>
+<span id="cb36-12"><a href="Chapter2.html#cb36-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;サルが観察された回数&quot;</span>,</span>
+<span id="cb36-13"><a href="Chapter2.html#cb36-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;度</span><span class="sc">\n</span><span class="st">数&quot;</span>) <span class="ot">-&gt;</span> p_zipois_hist</span>
+<span id="cb36-14"><a href="Chapter2.html#cb36-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-15"><a href="Chapter2.html#cb36-15" aria-hidden="true" tabindex="-1"></a>p_zipois_hist</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>これは、普通のポワソンモデルの結果と比較すると明白である。なお、<code>num_obs_sim</code>は普通のポワソン分布を仮定したGLMで推定されたパラメータからシミュレートされたデータである。</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="Chapter2.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">num_obs =</span> num_obs,</span>
+<span id="cb37-2"><a href="Chapter2.html#cb37-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">num_obs_zisim =</span> num_obs_zisim,</span>
+<span id="cb37-3"><a href="Chapter2.html#cb37-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">num_obs_sim =</span> num_obs_sim) <span class="sc">%&gt;%</span>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-4"><a href="Chapter2.html#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">fct_relevel</span>(name,<span class="st">&quot;num_obs&quot;</span>,<span class="st">&quot;num_obs_zisim&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-5"><a href="Chapter2.html#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value))<span class="sc">+</span></span>
+<span id="cb37-6"><a href="Chapter2.html#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">fill =</span> name),</span>
+<span id="cb37-7"><a href="Chapter2.html#cb37-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb37-8"><a href="Chapter2.html#cb37-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">15</span>,<span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb37-9"><a href="Chapter2.html#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">13</span>)<span class="sc">+</span></span>
+<span id="cb37-10"><a href="Chapter2.html#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
+<span id="cb37-11"><a href="Chapter2.html#cb37-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>,<span class="at">vjust=</span><span class="fl">0.5</span>))<span class="sc">+</span></span>
+<span id="cb37-12"><a href="Chapter2.html#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;サルが観察された回数&quot;</span>,</span>
+<span id="cb37-13"><a href="Chapter2.html#cb37-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;度</span><span class="sc">\n</span><span class="st">数&quot;</span>) </span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>検定をしても、ゼロ過剰は検出されない。</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="Chapter2.html#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">testZeroInflation</span>(r_zipois)</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="Chapter2.html#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">testZeroInflation</span>(r_zipois)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-30-1.png" width="432" style="display: block; margin: auto;" /></p>
 <pre><code>## 
 ##  DHARMa zero-inflation test via comparison to expected zeros with
@@ -457,9 +496,9 @@ num\_obs_i &amp;\sim ZIPoisson(q_i, \lambda_i)
 ## ratioObsSim = 0.99404, p-value = 1
 ## alternative hypothesis: two.sided</code></pre>
 <p>過分散も解消されたことが分かる。</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="Chapter2.html#cb35-1" aria-hidden="true" tabindex="-1"></a>resid_zipois <span class="ot">&lt;-</span><span class="fu">simulateResiduals</span>(r_zipois)</span>
-<span id="cb35-2"><a href="Chapter2.html#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-3"><a href="Chapter2.html#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">testDispersion</span>(resid_zipois)</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="Chapter2.html#cb40-1" aria-hidden="true" tabindex="-1"></a>resid_zipois <span class="ot">&lt;-</span><span class="fu">simulateResiduals</span>(r_zipois)</span>
+<span id="cb40-2"><a href="Chapter2.html#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="Chapter2.html#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">testDispersion</span>(resid_zipois)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-31-1.png" width="432" style="display: block; margin: auto;" /></p>
 <pre><code>## 
 ##  DHARMa nonparametric dispersion test via sd of residuals fitted vs.
@@ -469,57 +508,57 @@ num\_obs_i &amp;\sim ZIPoisson(q_i, \lambda_i)
 ## dispersion = 1.0069, p-value = 0.904
 ## alternative hypothesis: two.sided</code></pre>
 <p>QQplotをみても、データがモデルが仮定する分布によく合致している。</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="Chapter2.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotQQunif</span>(resid_zipois)</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="Chapter2.html#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotQQunif</span>(resid_zipois)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-32-1.png" width="432" style="display: block; margin: auto;" /></p>
 <p>推定されたモデルに基づく回帰曲線を描画する。<br />
 確率<span class="math inline">\(q_i\)</span>で得られた0を含まないものと、含むものを両方描ける。詳細は<a href="https://strengejacke.github.io/ggeffects/articles/introduction_randomeffects.html">こちら</a>。</p>
 <p><span class="math inline">\(q_i\)</span>で得られた0を<strong>含まない</strong>場合</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="Chapter2.html#cb38-1" aria-hidden="true" tabindex="-1"></a>fit_zipois_a <span class="ot">&lt;-</span> <span class="fu">ggpredict</span>(r_zipois,</span>
-<span id="cb38-2"><a href="Chapter2.html#cb38-2" aria-hidden="true" tabindex="-1"></a>          <span class="do">## 温度は5~15で0.1刻み</span></span>
-<span id="cb38-3"><a href="Chapter2.html#cb38-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">terms =</span> <span class="st">&quot;temp[5:15,by=0.1]&quot;</span>,</span>
-<span id="cb38-4"><a href="Chapter2.html#cb38-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">type =</span><span class="st">&quot;fixed&quot;</span>)</span>
-<span id="cb38-5"><a href="Chapter2.html#cb38-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-6"><a href="Chapter2.html#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat_zipois)<span class="sc">+</span></span>
-<span id="cb38-7"><a href="Chapter2.html#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">y =</span> num_obs),</span>
-<span id="cb38-8"><a href="Chapter2.html#cb38-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
-<span id="cb38-9"><a href="Chapter2.html#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="do">### 回帰曲線</span></span>
-<span id="cb38-10"><a href="Chapter2.html#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> fit_zipois_a,</span>
-<span id="cb38-11"><a href="Chapter2.html#cb38-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted))<span class="sc">+</span></span>
-<span id="cb38-12"><a href="Chapter2.html#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 95%信頼区間</span></span>
-<span id="cb38-13"><a href="Chapter2.html#cb38-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> fit_zipois_a,</span>
-<span id="cb38-14"><a href="Chapter2.html#cb38-14" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted,</span>
-<span id="cb38-15"><a href="Chapter2.html#cb38-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
-<span id="cb38-16"><a href="Chapter2.html#cb38-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
-<span id="cb38-17"><a href="Chapter2.html#cb38-17" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>)<span class="sc">+</span></span>
-<span id="cb38-18"><a href="Chapter2.html#cb38-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
-<span id="cb38-19"><a href="Chapter2.html#cb38-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title=</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">17</span>))<span class="sc">+</span></span>
-<span id="cb38-20"><a href="Chapter2.html#cb38-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;ゼロ過剰ポワソンモデル</span><span class="sc">\n</span><span class="st">(qによる0含まず)&quot;</span>)<span class="ot">-&gt;</span> p_zipois_a</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="Chapter2.html#cb43-1" aria-hidden="true" tabindex="-1"></a>fit_zipois_a <span class="ot">&lt;-</span> <span class="fu">ggpredict</span>(r_zipois,</span>
+<span id="cb43-2"><a href="Chapter2.html#cb43-2" aria-hidden="true" tabindex="-1"></a>          <span class="do">## 温度は5~15で0.1刻み</span></span>
+<span id="cb43-3"><a href="Chapter2.html#cb43-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">terms =</span> <span class="st">&quot;temp[5:15,by=0.1]&quot;</span>,</span>
+<span id="cb43-4"><a href="Chapter2.html#cb43-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">type =</span><span class="st">&quot;fixed&quot;</span>)</span>
+<span id="cb43-5"><a href="Chapter2.html#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-6"><a href="Chapter2.html#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat_zipois)<span class="sc">+</span></span>
+<span id="cb43-7"><a href="Chapter2.html#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">y =</span> num_obs),</span>
+<span id="cb43-8"><a href="Chapter2.html#cb43-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
+<span id="cb43-9"><a href="Chapter2.html#cb43-9" aria-hidden="true" tabindex="-1"></a>  <span class="do">### 回帰曲線</span></span>
+<span id="cb43-10"><a href="Chapter2.html#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> fit_zipois_a,</span>
+<span id="cb43-11"><a href="Chapter2.html#cb43-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted))<span class="sc">+</span></span>
+<span id="cb43-12"><a href="Chapter2.html#cb43-12" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 95%信頼区間</span></span>
+<span id="cb43-13"><a href="Chapter2.html#cb43-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> fit_zipois_a,</span>
+<span id="cb43-14"><a href="Chapter2.html#cb43-14" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted,</span>
+<span id="cb43-15"><a href="Chapter2.html#cb43-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
+<span id="cb43-16"><a href="Chapter2.html#cb43-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
+<span id="cb43-17"><a href="Chapter2.html#cb43-17" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>)<span class="sc">+</span></span>
+<span id="cb43-18"><a href="Chapter2.html#cb43-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
+<span id="cb43-19"><a href="Chapter2.html#cb43-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title=</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">17</span>))<span class="sc">+</span></span>
+<span id="cb43-20"><a href="Chapter2.html#cb43-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;ゼロ過剰ポワソンモデル</span><span class="sc">\n</span><span class="st">(qによる0含まず)&quot;</span>)<span class="ot">-&gt;</span> p_zipois_a</span></code></pre></div>
 <p><span class="math inline">\(q_i\)</span>で得られた0を<strong>含む</strong>場合</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="Chapter2.html#cb39-1" aria-hidden="true" tabindex="-1"></a>fit_zipois_b <span class="ot">&lt;-</span> <span class="fu">ggpredict</span>(r_zipois,</span>
-<span id="cb39-2"><a href="Chapter2.html#cb39-2" aria-hidden="true" tabindex="-1"></a>          <span class="do">## 温度は5~15で0.1刻み</span></span>
-<span id="cb39-3"><a href="Chapter2.html#cb39-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">terms =</span> <span class="st">&quot;temp[5:15,by=0.1]&quot;</span>,</span>
-<span id="cb39-4"><a href="Chapter2.html#cb39-4" aria-hidden="true" tabindex="-1"></a>          <span class="do">## ここを変える</span></span>
-<span id="cb39-5"><a href="Chapter2.html#cb39-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">type =</span><span class="st">&quot;zero_inflated&quot;</span>)</span>
-<span id="cb39-6"><a href="Chapter2.html#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-7"><a href="Chapter2.html#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat_zipois)<span class="sc">+</span></span>
-<span id="cb39-8"><a href="Chapter2.html#cb39-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">y =</span> num_obs),</span>
-<span id="cb39-9"><a href="Chapter2.html#cb39-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
-<span id="cb39-10"><a href="Chapter2.html#cb39-10" aria-hidden="true" tabindex="-1"></a>  <span class="do">### 回帰曲線</span></span>
-<span id="cb39-11"><a href="Chapter2.html#cb39-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> fit_zipois_b,</span>
-<span id="cb39-12"><a href="Chapter2.html#cb39-12" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted))<span class="sc">+</span></span>
-<span id="cb39-13"><a href="Chapter2.html#cb39-13" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 95%信頼区間</span></span>
-<span id="cb39-14"><a href="Chapter2.html#cb39-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> fit_zipois_b,</span>
-<span id="cb39-15"><a href="Chapter2.html#cb39-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted,</span>
-<span id="cb39-16"><a href="Chapter2.html#cb39-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
-<span id="cb39-17"><a href="Chapter2.html#cb39-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
-<span id="cb39-18"><a href="Chapter2.html#cb39-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>)<span class="sc">+</span></span>
-<span id="cb39-19"><a href="Chapter2.html#cb39-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
-<span id="cb39-20"><a href="Chapter2.html#cb39-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title=</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">17</span>))<span class="sc">+</span></span>
-<span id="cb39-21"><a href="Chapter2.html#cb39-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;ゼロ過剰ポワソンモデル</span><span class="sc">\n</span><span class="st">(qによる0含む)&quot;</span>) <span class="ot">-&gt;</span> p_zipois_b</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="Chapter2.html#cb44-1" aria-hidden="true" tabindex="-1"></a>fit_zipois_b <span class="ot">&lt;-</span> <span class="fu">ggpredict</span>(r_zipois,</span>
+<span id="cb44-2"><a href="Chapter2.html#cb44-2" aria-hidden="true" tabindex="-1"></a>          <span class="do">## 温度は5~15で0.1刻み</span></span>
+<span id="cb44-3"><a href="Chapter2.html#cb44-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">terms =</span> <span class="st">&quot;temp[5:15,by=0.1]&quot;</span>,</span>
+<span id="cb44-4"><a href="Chapter2.html#cb44-4" aria-hidden="true" tabindex="-1"></a>          <span class="do">## ここを変える</span></span>
+<span id="cb44-5"><a href="Chapter2.html#cb44-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">type =</span><span class="st">&quot;zero_inflated&quot;</span>)</span>
+<span id="cb44-6"><a href="Chapter2.html#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="Chapter2.html#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat_zipois)<span class="sc">+</span></span>
+<span id="cb44-8"><a href="Chapter2.html#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">y =</span> num_obs),</span>
+<span id="cb44-9"><a href="Chapter2.html#cb44-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
+<span id="cb44-10"><a href="Chapter2.html#cb44-10" aria-hidden="true" tabindex="-1"></a>  <span class="do">### 回帰曲線</span></span>
+<span id="cb44-11"><a href="Chapter2.html#cb44-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> fit_zipois_b,</span>
+<span id="cb44-12"><a href="Chapter2.html#cb44-12" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted))<span class="sc">+</span></span>
+<span id="cb44-13"><a href="Chapter2.html#cb44-13" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 95%信頼区間</span></span>
+<span id="cb44-14"><a href="Chapter2.html#cb44-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> fit_zipois_b,</span>
+<span id="cb44-15"><a href="Chapter2.html#cb44-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y =</span> predicted,</span>
+<span id="cb44-16"><a href="Chapter2.html#cb44-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
+<span id="cb44-17"><a href="Chapter2.html#cb44-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
+<span id="cb44-18"><a href="Chapter2.html#cb44-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>)<span class="sc">+</span></span>
+<span id="cb44-19"><a href="Chapter2.html#cb44-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="fl">0.8</span>,</span>
+<span id="cb44-20"><a href="Chapter2.html#cb44-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title=</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">17</span>))<span class="sc">+</span></span>
+<span id="cb44-21"><a href="Chapter2.html#cb44-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;ゼロ過剰ポワソンモデル</span><span class="sc">\n</span><span class="st">(qによる0含む)&quot;</span>) <span class="ot">-&gt;</span> p_zipois_b</span></code></pre></div>
 <p>比較のため、普通のポワソン回帰による回帰曲線も併置する。</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="Chapter2.html#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
-<span id="cb40-2"><a href="Chapter2.html#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-3"><a href="Chapter2.html#cb40-3" aria-hidden="true" tabindex="-1"></a>p_pois <span class="sc">+</span> p_zipois_a <span class="sc">+</span> p_zipois_b <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="Chapter2.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb45-2"><a href="Chapter2.html#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="Chapter2.html#cb45-3" aria-hidden="true" tabindex="-1"></a>p_pois <span class="sc">+</span> p_zipois_a <span class="sc">+</span> p_zipois_b <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-35-1.png" width="1248" style="display: block; margin: auto;" /></p>
 
 </div>

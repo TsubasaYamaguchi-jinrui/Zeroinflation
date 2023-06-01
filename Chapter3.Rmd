@@ -4,7 +4,8 @@
 ## ロジスティック回帰でゼロ過剰が生じる例  
 ニホンザルのメスが群れ外オスから攻撃された直後に怪我が確認されるか否かを調べた結果、以下のデータ(`dat_zibinom`)が得られたとする。なお、`sum`は攻撃された回数を、`num_inj`は攻撃の直後に怪我が確認された回数を、`age`はメスの年齢を表す。        
 
-```{r, echo = FALSE}
+シミュレーションによって架空のデータを作成する。  
+```{r}
 set.seed(1234)
 N <- 200
 age <- rnorm(N, 15, 3.5)
@@ -23,8 +24,10 @@ dat_zibinom <- data.frame(age = age,
            sum = sum)
 ```
 
+作成されたデータがこちら。  
 ```{r}
-dat_zibinom
+dat_zibinom %>% 
+  datatable()
 ```
 <br/>  
 
@@ -256,7 +259,7 @@ p_zibinom_hist
 
 これは、普通の二項分布モデルの結果(`prop_inj_sim`)と比較すると明白である。
 
-```{r, echo = FALSE, fig.dim = c(7,4.5)}
+```{r, fig.dim = c(7,4.5)}
 data.frame(prop_inj = dat_zibinom$num_inj/dat_zibinom$sum,
            prop_inj_zisim = prop_inj_zisim,
            prop_inj_sim = prop_inj_sim) %>%    pivot_longer(cols = 1:3) %>% 
@@ -362,8 +365,10 @@ p_binom + p_zibinom_a + p_zibinom_b + plot_layout(ncol = 2)
 ## ゼロ過剰二項モデルの分析例2(GLMMの場合)  
 ゼロ過剰モデルはランダム効果が含まれる一般化線形モデル(GLMM)についても適用できる。先ほどと同様に
 ニホンザルのメスが群れ外オスから攻撃された直後に怪我が確認されるか否かを調べたとする。今度は先ほどとは異なり5年分のデータがある、すなわち同じメスについて5つのデータポイントがあるとする(`dat_zibinomglmm`)。なお、`femaleID`はメスのIDを、`sum`は攻撃された回数を、`num_inj`は攻撃の直後に怪我が確認された回数を、`age`はメスの年齢を表す。        
+シミュレーションによって架空のデータを作成する。  
+```{r}
+## データの作成
 
-```{r, echo = FALSE}
 set.seed(1234)
 
 N <- 1000
@@ -387,8 +392,10 @@ dat_zibinom_glmm <- data.frame(femaleID = as.factor(femaleID),
            sum = sum)
 ```
 
+作成されたデータがこちら。  
 ```{r}
-dat_zibinom_glmm
+dat_zibinom_glmm %>% 
+  datatable()
 ```
 <br/>  
 

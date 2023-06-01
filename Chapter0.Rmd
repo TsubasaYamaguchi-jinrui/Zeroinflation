@@ -12,6 +12,7 @@ library(glmmTMB)
 library(statmod)
 library(DHARMa)
 library(brms)
+library(DT)
 ```
 
 なお、本稿はRの基本操作と`tidyverse`パッケージによるデータハンドリングができることを前提としている。`tidyverse`パッケージを用いたデータ処理については、以下の書籍などを参照。  
