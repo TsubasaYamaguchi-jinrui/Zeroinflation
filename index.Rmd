@@ -1,0 +1,37 @@
+--- 
+title: "Zero-inflated model using R"
+author: "Tsubasa Yamaguchi"
+date: "`r Sys.Date()`"
+output: 
+  bookdown::gitbook:
+    split_by: rmd  
+    split_bib: yes  
+    number_sections: true   
+    toc_depth: 4 
+    css: custom_style.css   
+    df_print: paged  
+site: bookdown::bookdown_site  
+output_dir: "docs"  
+documentclass: book  
+header-includes:
+   - \usepackage{amsmath}
+   - \usepackage{nccmath}
+biblio-style: jecon    
+bibliography: reference.bib   
+link-citations: yes
+csl: apa.csl
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,
+                      warning = FALSE, fig.align = "center",
+                      cache = TRUE)
+```
+
+# 本稿の目的 {-}   
+本稿は主に一般化線形モデルで用いられることが多い**ゼロ過剰モデル(zero-inflated model)**と呼ばれる手法の概要とRでの実装をまとめたものである。    
+
+本稿が主に参考にしたのは参考にしたのは @Rhodes2015 や @Matsuura2016 などである。  
+なお、本稿の作成に使用したファイルとRのコードは筆者の[Github](https://github.com/TsubasaYamaguchi-jinrui/Zeroinflation)ですべて閲覧できる。    
+
+

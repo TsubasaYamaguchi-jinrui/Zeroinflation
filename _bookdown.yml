@@ -1,0 +1,13 @@
+book_filename: "Zero-inflated model using R"  
+rmd_files:                    
+  - index.Rmd
+  - Chapter0.Rmd
+  - Chapter1.Rmd 
+  - Chapter2.Rmd 
+  - Chapter3.Rmd
+  - sessioninfo.Rmd
+output_dir: "docs"  
+language:
+  label:
+    fig: "図"
+    tab: "表"
