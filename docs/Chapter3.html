@@ -392,15 +392,13 @@ q_i + (1-q_i)\times _n C _0 p_i^0(1-p_i)^{n_i-0} \\
 <div id="ゼロ過剰二項モデルの分析例1glmの場合" class="section level2 hasAnchor" number="3.3">
 <h2><span class="header-section-number">3.3</span> ゼロ過剰二項モデルの分析例1(GLMの場合)<a href="Chapter3.html#ゼロ過剰二項モデルの分析例1glmの場合" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>それでは、先ほどのデータをゼロ過剰二項モデルに当てはめよう。データが以下の式に従って得られると仮定する。モデルでは、<span class="math inline">\(q_i\)</span>も年齢によって変化すると仮定する(年齢によらないと仮定することもできる)。なお、<span class="math inline">\(num\_inj_i \sim ZIBinomial(p_i)\)</span>は怪我が確認された回数がゼロ過剰二項モデルに従って得られることを示す。</p>
-$$
-<span class="math display">\[\begin{aligned}
+<p><span class="math display">\[
+\begin{aligned}
 logit(q_i) &amp;= log(\frac{q_i}{1-q_i}) = \beta_{10} + \beta_{11} \times age_i\\
-
 logit(p_i) &amp;= log(\frac{p_i}{1-p_i}) = \beta_{20} + \beta_{21} \times age_i\\
-
 num\_inj_i &amp;\sim ZIBinomial(q_i, trials_i, p_i)
-\end{aligned}\]</span>
-<p>$$</p>
+\end{aligned}
+\]</span></p>
 <p>Rでは<code>glmmTMB</code>パッケージを用いて以下のようにパラメータを推定できる。<span class="math inline">\(q_i\)</span>が年齢によらないと仮定する場合は、<code>ziformula ~ 1</code>とする。</p>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="Chapter3.html#cb55-1" aria-hidden="true" tabindex="-1"></a>r_zibinom <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(<span class="at">data =</span> dat_zibinom,</span>
 <span id="cb55-2"><a href="Chapter3.html#cb55-2" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">cbind</span>(num_inj, sum <span class="sc">-</span> num_inj) <span class="sc">~</span> age,</span>

@@ -196,9 +196,7 @@ $$
 $$
 \begin{aligned}
 logit(q_i) &= log(\frac{q_i}{1-q_i}) = \beta_{10} + \beta_{11} \times age_i\\
-
 logit(p_i) &= log(\frac{p_i}{1-p_i}) = \beta_{20} + \beta_{21} \times age_i\\
-
 num\_inj_i &\sim ZIBinomial(q_i, trials_i, p_i)
 \end{aligned}
 $$

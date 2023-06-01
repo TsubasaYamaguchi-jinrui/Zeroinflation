@@ -381,15 +381,13 @@ q_i + (1-q_i)\times\frac{\lambda_i^0}{0!} e^{-\lambda_i} \\
 <div id="ゼロ過剰ポワソンモデルの分析例" class="section level2 hasAnchor" number="2.3">
 <h2><span class="header-section-number">2.3</span> ゼロ過剰ポワソンモデルの分析例<a href="Chapter2.html#ゼロ過剰ポワソンモデルの分析例" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>それでは、先ほどのデータをゼロ過剰ポワソンモデルに当てはめよう。データが以下の式に従って得られると仮定する。このモデルでは、<span class="math inline">\(q_i\)</span>も気温によって変化すると仮定する(気温によらないとモデリングすることもできる)。なお、<span class="math inline">\(num\_obs_i \sim ZIPoisson(\lambda_i)\)</span>はサルの観察回数がゼロ過剰ポワソンモデルに従って得られることを示す。<br />
-$$</p>
-<span class="math display">\[\begin{aligned}
+<span class="math display">\[
+\begin{aligned}
 logit(q_i) &amp;= log(\frac{q_i}{1-q_i}) = \beta_{10} + \beta_{11} \times temp_i\\
-
 log(\lambda_i) &amp;= \beta_{20} + \beta_{21}\times temp_i\\
-
 num\_obs_i &amp;\sim ZIPoisson(q_i, \lambda_i)
-\end{aligned}\]</span>
-<p>$$</p>
+\end{aligned}
+\]</span></p>
 <p>Rでは<code>glmmTMB</code>パッケージを用いて以下のようにパラメータを推定できる。<span class="math inline">\(q_i\)</span>が気温によらないと仮定する場合は、<code>ziformula ~ 1</code>とする。</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="Chapter2.html#cb28-1" aria-hidden="true" tabindex="-1"></a>r_zipois <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(<span class="at">data =</span> dat_zipois,</span>
 <span id="cb28-2"><a href="Chapter2.html#cb28-2" aria-hidden="true" tabindex="-1"></a>                    num_obs <span class="sc">~</span> temp,</span>

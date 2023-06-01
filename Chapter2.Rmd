@@ -185,15 +185,11 @@ $$
 ## ゼロ過剰ポワソンモデルの分析例  
 それでは、先ほどのデータをゼロ過剰ポワソンモデルに当てはめよう。データが以下の式に従って得られると仮定する。このモデルでは、$q_i$も気温によって変化すると仮定する(気温によらないとモデリングすることもできる)。なお、$num\_obs_i \sim ZIPoisson(\lambda_i)$はサルの観察回数がゼロ過剰ポワソンモデルに従って得られることを示す。  
 $$
-
 \begin{aligned}
 logit(q_i) &= log(\frac{q_i}{1-q_i}) = \beta_{10} + \beta_{11} \times temp_i\\
-
 log(\lambda_i) &= \beta_{20} + \beta_{21}\times temp_i\\
-
 num\_obs_i &\sim ZIPoisson(q_i, \lambda_i)
 \end{aligned}
-
 $$
 
 Rでは`glmmTMB`パッケージを用いて以下のようにパラメータを推定できる。$q_i$が気温によらないと仮定する場合は、`ziformula ~ 1`とする。  
