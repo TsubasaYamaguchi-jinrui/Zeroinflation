@@ -5,6 +5,6 @@
 本稿が主に参考にしたのは参考にしたのは Rhodes(2015)や松浦(2016)などである。  
 なお、本稿の作成に使用したファイルとRのコードは筆者の[Github](https://github.com/TsubasaYamaguchi-jinrui/Zeroinflation)ですべて閲覧できる。    
 
-References
+**References**  
 Fox, G., & Sosa, V. (2015). Mixture models for overdispersed data. In Ecological statictics: Contemporary theory and application (pp. 284–308). Oxford University Press.
 松浦健太郎. (2016). StanとRでベイズ統計モデリング. 共立出版.
