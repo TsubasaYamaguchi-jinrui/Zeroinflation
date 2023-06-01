@@ -1,6 +1,6 @@
 # 本稿の目的  
 
-本稿は主に一般化線形モデルで用いられることが多い**ゼロ過剰モデル(zero-inflated model)**と呼ばれる手法の概要とRでの実装をまとめたものである。    
+本稿は主に一般化線形モデルで用いられることが多い**ゼロ過剰モデル(zero-inflated model)**と呼ばれる手法の概要とRでの実装をまとめたものである。[本文はこちら](https://tsubasayamaguchi-jinrui.github.io/Zeroinflation/)。       
 
 本稿が主に参考にしたのは参考にしたのは Rhodes(2015)や松浦(2016)などである。  
 なお、本稿の作成に使用したファイルとRのコードは筆者の[Github](https://github.com/TsubasaYamaguchi-jinrui/Zeroinflation)ですべて閲覧できる。    
