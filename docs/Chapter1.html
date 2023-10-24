@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>1 一般化線形モデル(GLM)における過分散 | Zero-inflated model using R</title>
   <meta name="description" content="1 一般化線形モデル(GLM)における過分散 | Zero-inflated model using R" />
-  <meta name="generator" content="bookdown 0.31 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
 
   <meta property="og:title" content="1 一般化線形モデル(GLM)における過分散 | Zero-inflated model using R" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Tsubasa Yamaguchi" />
 
 
-<meta name="date" content="2023-06-01" />
+<meta name="date" content="2023-10-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -130,6 +130,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </style>
 
 <style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
 /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
 div.csl-bib-body { }
 div.csl-entry {
@@ -229,22 +233,22 @@ div.csl-indent {
 P(x|n,p) = _n C _x p^x(1-p)^{n-x} \quad (x \geq 0)
 \]</span></p>
 <p>実際に表が出る確率が0.4のコインを10回ふったときの確率分布は以下のようになる。</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="Chapter1.html#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## xは0から10までとりうる</span></span>
-<span id="cb2-2"><a href="Chapter1.html#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="dv">1</span>)</span>
-<span id="cb2-3"><a href="Chapter1.html#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="Chapter1.html#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## それぞれのxの値を取りうる確率  </span></span>
-<span id="cb2-5"><a href="Chapter1.html#cb2-5" aria-hidden="true" tabindex="-1"></a>p_x <span class="ot">&lt;-</span> <span class="fu">dbinom</span>(x, <span class="at">size =</span> <span class="dv">10</span>, <span class="at">prob =</span> <span class="fl">0.4</span>)</span>
-<span id="cb2-6"><a href="Chapter1.html#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="Chapter1.html#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 作図  </span></span>
-<span id="cb2-8"><a href="Chapter1.html#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">x =</span> x,</span>
-<span id="cb2-9"><a href="Chapter1.html#cb2-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">p_x =</span> p_x) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-10"><a href="Chapter1.html#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> p_x))<span class="sc">+</span></span>
-<span id="cb2-11"><a href="Chapter1.html#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>()<span class="sc">+</span></span>
-<span id="cb2-12"><a href="Chapter1.html#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
-<span id="cb2-13"><a href="Chapter1.html#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>,</span>
-<span id="cb2-14"><a href="Chapter1.html#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>,</span>
-<span id="cb2-15"><a href="Chapter1.html#cb2-15" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">vjust =</span> <span class="fl">0.5</span>))<span class="sc">+</span></span>
-<span id="cb2-16"><a href="Chapter1.html#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;x</span><span class="sc">\n</span><span class="st">回</span><span class="sc">\n</span><span class="st">表</span><span class="sc">\n</span><span class="st">が</span><span class="sc">\n</span><span class="st">出</span><span class="sc">\n</span><span class="st">る</span><span class="sc">\n</span><span class="st">確</span><span class="sc">\n</span><span class="st">率&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="Chapter1.html#cb2-1" tabindex="-1"></a><span class="do">## xは0から10までとりうる</span></span>
+<span id="cb2-2"><a href="Chapter1.html#cb2-2" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="Chapter1.html#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="Chapter1.html#cb2-4" tabindex="-1"></a><span class="do">## それぞれのxの値を取りうる確率  </span></span>
+<span id="cb2-5"><a href="Chapter1.html#cb2-5" tabindex="-1"></a>p_x <span class="ot">&lt;-</span> <span class="fu">dbinom</span>(x, <span class="at">size =</span> <span class="dv">10</span>, <span class="at">prob =</span> <span class="fl">0.4</span>)</span>
+<span id="cb2-6"><a href="Chapter1.html#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="Chapter1.html#cb2-7" tabindex="-1"></a><span class="do">## 作図  </span></span>
+<span id="cb2-8"><a href="Chapter1.html#cb2-8" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">x =</span> x,</span>
+<span id="cb2-9"><a href="Chapter1.html#cb2-9" tabindex="-1"></a>           <span class="at">p_x =</span> p_x) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-10"><a href="Chapter1.html#cb2-10" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> p_x))<span class="sc">+</span></span>
+<span id="cb2-11"><a href="Chapter1.html#cb2-11" tabindex="-1"></a>  <span class="fu">geom_col</span>()<span class="sc">+</span></span>
+<span id="cb2-12"><a href="Chapter1.html#cb2-12" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
+<span id="cb2-13"><a href="Chapter1.html#cb2-13" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>,</span>
+<span id="cb2-14"><a href="Chapter1.html#cb2-14" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>,</span>
+<span id="cb2-15"><a href="Chapter1.html#cb2-15" tabindex="-1"></a>                                    <span class="at">vjust =</span> <span class="fl">0.5</span>))<span class="sc">+</span></span>
+<span id="cb2-16"><a href="Chapter1.html#cb2-16" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;x</span><span class="sc">\n</span><span class="st">回</span><span class="sc">\n</span><span class="st">表</span><span class="sc">\n</span><span class="st">が</span><span class="sc">\n</span><span class="st">出</span><span class="sc">\n</span><span class="st">る</span><span class="sc">\n</span><span class="st">確</span><span class="sc">\n</span><span class="st">率&quot;</span>)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-3-1.png" width="384" style="display: block; margin: auto;" /></p>
 <p>先ほどの式からわかるように、二項分布の形は<span class="math inline">\(p\)</span>と<span class="math inline">\(n\)</span>にという二つの値によって決まる。このように確率分布を特徴づける値のことを<strong>母数(パラメータ)</strong>という。GLMなどのモデリングでは、分布を決めるために必要なパラメータを実際のデータから推定することが目的になる。例えば、応答変数が二項分布に従うモデルを考える場合、試行数<span class="math inline">\(n\)</span>は既知なので、データが得られる確率が最も高くなるように<span class="math inline">\(p\)</span>を推定することがゴールとなる。</p>
 <p>さて、二項分布の平均と分散は<span class="math inline">\(p\)</span>と<span class="math inline">\(n\)</span>によって以下のように定まる。ここで重要なのは、<strong>二項分布は</strong><span class="math inline">\(n\)</span>と<span class="math inline">\(p\)</span><strong>が定まれば平均も分散も決まってしまう</strong>ということである。</p>
@@ -263,22 +267,22 @@ P(x) = \frac{\lambda^x}{x!}e^{-\lambda} \quad (x \geq 0)
 \]</span></p>
 <p>このように、ポワソン分布はたったひとつのパラメータ<span class="math inline">\(\lambda\)</span>によって形が決まる。<strong>ポワソン分布の平均と分散はいずれも</strong><span class="math inline">\(\lambda\)</span><strong>となる。</strong></p>
 <p><span class="math inline">\(\lambda = 5.6\)</span>の時のポワソン分布は以下のようになる。</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="Chapter1.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## xは0から10までとりうる</span></span>
-<span id="cb3-2"><a href="Chapter1.html#cb3-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">15</span>,<span class="at">by=</span><span class="dv">1</span>)</span>
-<span id="cb3-3"><a href="Chapter1.html#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="Chapter1.html#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">## それぞれのxの値を取りうる確率  </span></span>
-<span id="cb3-5"><a href="Chapter1.html#cb3-5" aria-hidden="true" tabindex="-1"></a>p_x <span class="ot">&lt;-</span> <span class="fu">dpois</span>(x, <span class="fl">5.6</span>)</span>
-<span id="cb3-6"><a href="Chapter1.html#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="Chapter1.html#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 作図  </span></span>
-<span id="cb3-8"><a href="Chapter1.html#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">x =</span> x,</span>
-<span id="cb3-9"><a href="Chapter1.html#cb3-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">p_x =</span> p_x) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-10"><a href="Chapter1.html#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> p_x))<span class="sc">+</span></span>
-<span id="cb3-11"><a href="Chapter1.html#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>()<span class="sc">+</span></span>
-<span id="cb3-12"><a href="Chapter1.html#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
-<span id="cb3-13"><a href="Chapter1.html#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>,</span>
-<span id="cb3-14"><a href="Chapter1.html#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>,</span>
-<span id="cb3-15"><a href="Chapter1.html#cb3-15" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">vjust =</span> <span class="fl">0.5</span>))<span class="sc">+</span></span>
-<span id="cb3-16"><a href="Chapter1.html#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;x</span><span class="sc">\n</span><span class="st">回</span><span class="sc">\n</span><span class="st">事</span><span class="sc">\n</span><span class="st">象</span><span class="sc">\n</span><span class="st">が</span><span class="sc">\n</span><span class="st">生</span><span class="sc">\n</span><span class="st">じ</span><span class="sc">\n</span><span class="st">る</span><span class="sc">\n</span><span class="st">確</span><span class="sc">\n</span><span class="st">率&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="Chapter1.html#cb3-1" tabindex="-1"></a><span class="do">## xは0から10までとりうる</span></span>
+<span id="cb3-2"><a href="Chapter1.html#cb3-2" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">15</span>,<span class="at">by=</span><span class="dv">1</span>)</span>
+<span id="cb3-3"><a href="Chapter1.html#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="Chapter1.html#cb3-4" tabindex="-1"></a><span class="do">## それぞれのxの値を取りうる確率  </span></span>
+<span id="cb3-5"><a href="Chapter1.html#cb3-5" tabindex="-1"></a>p_x <span class="ot">&lt;-</span> <span class="fu">dpois</span>(x, <span class="fl">5.6</span>)</span>
+<span id="cb3-6"><a href="Chapter1.html#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="Chapter1.html#cb3-7" tabindex="-1"></a><span class="do">## 作図  </span></span>
+<span id="cb3-8"><a href="Chapter1.html#cb3-8" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">x =</span> x,</span>
+<span id="cb3-9"><a href="Chapter1.html#cb3-9" tabindex="-1"></a>           <span class="at">p_x =</span> p_x) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-10"><a href="Chapter1.html#cb3-10" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> p_x))<span class="sc">+</span></span>
+<span id="cb3-11"><a href="Chapter1.html#cb3-11" tabindex="-1"></a>  <span class="fu">geom_col</span>()<span class="sc">+</span></span>
+<span id="cb3-12"><a href="Chapter1.html#cb3-12" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
+<span id="cb3-13"><a href="Chapter1.html#cb3-13" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>,</span>
+<span id="cb3-14"><a href="Chapter1.html#cb3-14" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>,</span>
+<span id="cb3-15"><a href="Chapter1.html#cb3-15" tabindex="-1"></a>                                    <span class="at">vjust =</span> <span class="fl">0.5</span>))<span class="sc">+</span></span>
+<span id="cb3-16"><a href="Chapter1.html#cb3-16" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;x</span><span class="sc">\n</span><span class="st">回</span><span class="sc">\n</span><span class="st">事</span><span class="sc">\n</span><span class="st">象</span><span class="sc">\n</span><span class="st">が</span><span class="sc">\n</span><span class="st">生</span><span class="sc">\n</span><span class="st">じ</span><span class="sc">\n</span><span class="st">る</span><span class="sc">\n</span><span class="st">確</span><span class="sc">\n</span><span class="st">率&quot;</span>)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-4-1.png" width="384" style="display: block; margin: auto;" /></p>
 </div>
 </div>
@@ -290,29 +294,29 @@ P(x) = \frac{\lambda^x}{x!}e^{-\lambda} \quad (x \geq 0)
 <h3><span class="header-section-number">1.2.1</span> 過分散の例<a href="Chapter1.html#過分散の例" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>例えば、ニホンザルにある餌を10回提示したときに食べる回数を調べたとしよう。50個体分のデータを収集した結果、以下のデータが得られたとする(<code>dat_binom</code>というデータ)。なお、<code>n</code>は餌を提示した回数、<code>x</code>はサルが餌を食べた回数を示す。</p>
 <p>シミュレーションによって架空のデータを作成する。</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="Chapter1.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 架空データの作成  </span></span>
-<span id="cb4-2"><a href="Chapter1.html#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb4-3"><a href="Chapter1.html#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="Chapter1.html#cb4-4" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">50</span></span>
-<span id="cb4-5"><a href="Chapter1.html#cb4-5" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb4-6"><a href="Chapter1.html#cb4-6" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">rpois</span>(N, <span class="at">lambda =</span> <span class="dv">7</span>)</span>
-<span id="cb4-7"><a href="Chapter1.html#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="Chapter1.html#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 平均して確率0.3で餌を食べるとするときの回数x。</span></span>
-<span id="cb4-9"><a href="Chapter1.html#cb4-9" aria-hidden="true" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="fl">2.5</span>)</span>
-<span id="cb4-10"><a href="Chapter1.html#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="Chapter1.html#cb4-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>,N)</span>
-<span id="cb4-12"><a href="Chapter1.html#cb4-12" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>,N)</span>
-<span id="cb4-13"><a href="Chapter1.html#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="Chapter1.html#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>){</span>
-<span id="cb4-15"><a href="Chapter1.html#cb4-15" aria-hidden="true" tabindex="-1"></a>  p[i] <span class="ot">&lt;-</span> <span class="fu">inv_logit_scaled</span>(<span class="sc">-</span><span class="fl">0.75</span> <span class="sc">+</span> <span class="fl">0.17</span><span class="sc">*</span>age[i]<span class="sc">+</span> r[i])</span>
-<span id="cb4-16"><a href="Chapter1.html#cb4-16" aria-hidden="true" tabindex="-1"></a>  x[i] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1</span>,n,p[i])</span>
-<span id="cb4-17"><a href="Chapter1.html#cb4-17" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-18"><a href="Chapter1.html#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="Chapter1.html#cb4-19" aria-hidden="true" tabindex="-1"></a>dat_binom <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x,</span>
-<span id="cb4-20"><a href="Chapter1.html#cb4-20" aria-hidden="true" tabindex="-1"></a>                        <span class="at">n =</span> n)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="Chapter1.html#cb4-1" tabindex="-1"></a><span class="do">## 架空データの作成  </span></span>
+<span id="cb4-2"><a href="Chapter1.html#cb4-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb4-3"><a href="Chapter1.html#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="Chapter1.html#cb4-4" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb4-5"><a href="Chapter1.html#cb4-5" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb4-6"><a href="Chapter1.html#cb4-6" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">rpois</span>(N, <span class="at">lambda =</span> <span class="dv">7</span>)</span>
+<span id="cb4-7"><a href="Chapter1.html#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="Chapter1.html#cb4-8" tabindex="-1"></a><span class="do">## 平均して確率0.3で餌を食べるとするときの回数x。</span></span>
+<span id="cb4-9"><a href="Chapter1.html#cb4-9" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="fl">2.5</span>)</span>
+<span id="cb4-10"><a href="Chapter1.html#cb4-10" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="Chapter1.html#cb4-11" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>,N)</span>
+<span id="cb4-12"><a href="Chapter1.html#cb4-12" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>,N)</span>
+<span id="cb4-13"><a href="Chapter1.html#cb4-13" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="Chapter1.html#cb4-14" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>){</span>
+<span id="cb4-15"><a href="Chapter1.html#cb4-15" tabindex="-1"></a>  p[i] <span class="ot">&lt;-</span> <span class="fu">inv_logit_scaled</span>(<span class="sc">-</span><span class="fl">0.75</span> <span class="sc">+</span> <span class="fl">0.17</span><span class="sc">*</span>age[i]<span class="sc">+</span> r[i])</span>
+<span id="cb4-16"><a href="Chapter1.html#cb4-16" tabindex="-1"></a>  x[i] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1</span>,n,p[i])</span>
+<span id="cb4-17"><a href="Chapter1.html#cb4-17" tabindex="-1"></a>}</span>
+<span id="cb4-18"><a href="Chapter1.html#cb4-18" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="Chapter1.html#cb4-19" tabindex="-1"></a>dat_binom <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x,</span>
+<span id="cb4-20"><a href="Chapter1.html#cb4-20" tabindex="-1"></a>                        <span class="at">n =</span> n)</span></code></pre></div>
 <p>生成されたデータがこちら。</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="Chapter1.html#cb5-1" aria-hidden="true" tabindex="-1"></a>dat_binom <span class="sc">%&gt;%</span> </span>
-<span id="cb5-2"><a href="Chapter1.html#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="Chapter1.html#cb5-1" tabindex="-1"></a>dat_binom <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="Chapter1.html#cb5-2" tabindex="-1"></a>  <span class="fu">datatable</span>()</span></code></pre></div>
 <div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-1d5df3d80f5735caaf13" style="width:100%;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-1d5df3d80f5735caaf13">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50"],[0,10,7,0,10,7,5,10,10,10,10,9,6,4,2,3,5,0,10,10,2,3,5,10,5,7,6,6,9,4,10,0,8,8,5,8,3,3,2,2,8,9,3,9,10,2,0,9,0,3],[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>x<\/th>\n      <th>n<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
 <p><br /></p>
@@ -325,11 +329,11 @@ x_i &amp;\sim Binomial(n_i, p_i)
 \end{aligned}
 \]</span></p>
 <p>RでGLMを実行するコードは以下のようになる。</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="Chapter1.html#cb6-1" aria-hidden="true" tabindex="-1"></a>r_binom_sample <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="at">data =</span> dat_binom,</span>
-<span id="cb6-2"><a href="Chapter1.html#cb6-2" aria-hidden="true" tabindex="-1"></a>               <span class="fu">cbind</span>(x, n<span class="sc">-</span>x) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb6-3"><a href="Chapter1.html#cb6-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="Chapter1.html#cb6-1" tabindex="-1"></a>r_binom_sample <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="at">data =</span> dat_binom,</span>
+<span id="cb6-2"><a href="Chapter1.html#cb6-2" tabindex="-1"></a>               <span class="fu">cbind</span>(x, n<span class="sc">-</span>x) <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb6-3"><a href="Chapter1.html#cb6-3" tabindex="-1"></a>               <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
 <p>結果は以下のようになる。推定されたパラメータ<span class="math inline">\(\beta\)</span>は0.298である。</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="Chapter1.html#cb7-1" aria-hidden="true" tabindex="-1"></a>r_binom_sample</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="Chapter1.html#cb7-1" tabindex="-1"></a>r_binom_sample</span></code></pre></div>
 <pre><code>## 
 ## Call:  glm(formula = cbind(x, n - x) ~ 1, family = &quot;binomial&quot;, data = dat_binom)
 ## 
@@ -342,10 +346,10 @@ x_i &amp;\sim Binomial(n_i, p_i)
 ## Residual Deviance: 313   AIC: 397.7</code></pre>
 <p>このとき、分析結果から推定される<span class="math inline">\(p\)</span>は、<span class="math inline">\(log(\frac{p}{1-p}) = e^{0.2982..}\)</span> より(リンク関数はロジット関数なので)、<span class="math inline">\(p =\)</span> 0.574…となる。</p>
 <p>これは実際のデータにおいてサルが餌を食べた平均割合ともほぼ一致する。</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="Chapter1.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(dat_binom<span class="sc">$</span>x<span class="sc">/</span>dat_binom<span class="sc">$</span>n)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="Chapter1.html#cb9-1" tabindex="-1"></a><span class="fu">mean</span>(dat_binom<span class="sc">$</span>x<span class="sc">/</span>dat_binom<span class="sc">$</span>n)</span></code></pre></div>
 <pre><code>## [1] 0.574</code></pre>
 <p>もしデータが二項分布に従うならば、その分散は<span class="math inline">\(np(1-p) = 10\times0.574\times0.426 = 2.445..\)</span>となるはずだと期待される。しかし、実際のデータの分散はそれよりも大きくなっている。</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="Chapter1.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(dat_binom<span class="sc">$</span>x)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="Chapter1.html#cb11-1" tabindex="-1"></a><span class="fu">sd</span>(dat_binom<span class="sc">$</span>x)</span></code></pre></div>
 <pre><code>## [1] 3.498163</code></pre>
 <p>GLM(M)において、過分散が生じているかはdispersion parameter (<span class="math inline">\(\phi\)</span>)が既定の値(ポワソン分布や二項分布では1)よりも大きいかで調べられる。</p>
 <p>dispersion parameter (<span class="math inline">\(\phi\)</span>)は以下の式で算出される。<br />
@@ -359,11 +363,11 @@ x_i &amp;\sim Binomial(n_i, p_i)
 \]</span></p>
 <p>Rでは以下のように求められる。<br />
 <strong>値が1を大きく超えており、過分散が生じていることが分かる</strong>。</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="Chapter1.html#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">residuals</span>(r_binom_sample,<span class="at">type =</span> <span class="st">&quot;pearson&quot;</span>)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>r_binom_sample<span class="sc">$</span>df.residual</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="Chapter1.html#cb13-1" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">residuals</span>(r_binom_sample,<span class="at">type =</span> <span class="st">&quot;pearson&quot;</span>)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>r_binom_sample<span class="sc">$</span>df.residual</span></code></pre></div>
 <pre><code>## [1] 5.004475</code></pre>
 <p>また、過分散が生じているかは、推定したパラメータを持つ分布からデータをシミュレートし、それを実際のデータと比較することで検定することもできる。詳しい方法については、<a href="https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html#binomial-data">このサイト</a>を参照。</p>
 <p>検定の結果、有意な過分散が検出された。</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="Chapter1.html#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">testDispersion</span>(r_binom_sample)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="Chapter1.html#cb15-1" tabindex="-1"></a><span class="fu">testDispersion</span>(r_binom_sample)</span></code></pre></div>
 <p><img src="Zero-inflated-model-using-R_files/figure-html/unnamed-chunk-12-1.png" width="384" style="display: block; margin: auto;" /></p>
 <pre><code>## 
 ##  DHARMa nonparametric dispersion test via sd of residuals fitted vs.
@@ -376,12 +380,12 @@ x_i &amp;\sim Binomial(n_i, p_i)
 </div>
 <div id="過分散の問題点" class="section level3 hasAnchor" number="1.2.2">
 <h3><span class="header-section-number">1.2.2</span> 過分散の問題点<a href="Chapter1.html#過分散の問題点" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>過分散が生じているということは、推定値のばらつきが過小評価されており、データがモデルにうまく適合していないことを示す<span class="citation">(<a href="#ref-Rhodes2015" role="doc-biblioref">Fox &amp; Sosa, 2015</a>; <a href="#ref-Harrison2018" role="doc-biblioref">Harrison et al., 2018</a>)</span>。</p>
-<p>これによって生じる大きな問題は、統計検定において<strong>第一種の過誤(帰無仮説が正しいにもかかわらず誤って棄却してしまうこと)が生じる確率が高まってしまう</strong>ということである<span class="citation">(<a href="#ref-Rhodes2015" role="doc-biblioref">Fox &amp; Sosa, 2015</a>; <a href="#ref-Harrison2018" role="doc-biblioref">Harrison et al., 2018</a>)</span></p>
+<p>過分散が生じているということは、推定値のばらつきが過小評価されており、データがモデルにうまく適合していないことを示す<span class="citation">(<a href="#ref-Rhodes2015">Fox &amp; Sosa, 2015</a>; <a href="#ref-Harrison2018">Harrison et al., 2018</a>)</span>。</p>
+<p>これによって生じる大きな問題は、統計検定において<strong>第一種の過誤(帰無仮説が正しいにもかかわらず誤って棄却してしまうこと)が生じる確率が高まってしまう</strong>ということである<span class="citation">(<a href="#ref-Rhodes2015">Fox &amp; Sosa, 2015</a>; <a href="#ref-Harrison2018">Harrison et al., 2018</a>)</span></p>
 </div>
 <div id="過分散が生じる要因とゼロ過剰" class="section level3 hasAnchor" number="1.2.3">
 <h3><span class="header-section-number">1.2.3</span> 過分散が生じる要因とゼロ過剰<a href="Chapter1.html#過分散が生じる要因とゼロ過剰" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>過分散が生じる要因としては、空間的・時間的相関があることでデータに偏りが生じること、データが独立でないこと(cf. 疑似反復)、データ間のばらつきが大きいことなどがある。こうした要因によって過分散が生じている際の一般的な解決策としては、疑似尤度を用いる、ランダム効果を用いるなどの方法がある<span class="citation">(<a href="#ref-Kasuya2012" role="doc-biblioref">粕谷, 2012</a>)</span>。</p>
+<p>過分散が生じる要因としては、空間的・時間的相関があることでデータに偏りが生じること、データが独立でないこと(cf. 疑似反復)、データ間のばらつきが大きいことなどがある。こうした要因によって過分散が生じている際の一般的な解決策としては、疑似尤度を用いる、ランダム効果を用いるなどの方法がある<span class="citation">(<a href="#ref-Kasuya2012">粕谷, 2012</a>)</span>。</p>
 <p>本稿で着目するのは、これら以外の要因、すなわちモデルから想定されるよりもゼロが多くなってしまう場合(<strong>ゼロ過剰</strong>)についてである。以下ではゼロ過剰が生じているデータについて見たうえで、その対処法についてまとめる。こうしたデータに対しては、<strong>ゼロ過剰モデル</strong>を用いることで対処することができる。</p>
 
 </div>

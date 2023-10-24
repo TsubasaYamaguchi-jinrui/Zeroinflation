@@ -89,13 +89,15 @@ data.frame(num_obs = num_obs,
   pivot_longer(cols = 1:2) %>% 
   ggplot(aes(x = value))+
   geom_histogram(aes(fill = name),
+                 color = "black",
                  position = "dodge", alpha = 0.8,
                  breaks = seq(0,15,1))+
   theme_bw(base_size = 13)+
   theme(aspect.ratio=0.8,
         axis.title.y = element_text(angle=0,vjust=0.5))+
   labs(x = "サルが観察された回数",
-       y = "度\n数") -> p_pois_hist
+       y = "度\n数")+
+  scale_fill_manual(values = c("grey","black")) -> p_pois_hist
 
 p_pois_hist
 ```
@@ -227,7 +229,7 @@ lambda <- exp((fixef(r_zipois)[[1]][[1]] + fixef(r_zipois)[[1]][[2]]*dat_zipois$
 num_obs_zisim <- rbinom(N,1,1-q)*rpois(N, lambda)
 ```
 
-下の図からわかるように、推定されたモデルからシミュレートされたデータ(`num_obs_zisim`)の分布は、実際のデータとかなりよくマッチしていることが分かる。   
+下の図からわかるように、推定されたモデルからシミュレートされたデータ(`num_obs_zisim`)の分布は、実際のデータ(`num_obs`)とかなりよくマッチしていることが分かる。   
 
 ```{r, fig.dim = c(7,4.5)}
 ## 実際のデータと比較  
@@ -236,13 +238,15 @@ data.frame(num_obs = dat_zipois$num_obs,
   pivot_longer(cols = 1:2) %>% 
   ggplot(aes(x = value))+
   geom_histogram(aes(fill = name),
+                 color = "black",
                  position = "dodge", alpha = 0.8,
                  breaks = seq(0,15,1))+
   theme_bw(base_size = 13)+
   theme(aspect.ratio=0.8,
         axis.title.y = element_text(angle=0,vjust=0.5))+
   labs(x = "サルが観察された回数",
-       y = "度\n数") -> p_zipois_hist
+       y = "度\n数") +
+  scale_fill_manual(values = c("grey","red3")) -> p_zipois_hist
 
 p_zipois_hist
 ```
@@ -256,13 +260,15 @@ data.frame(num_obs = num_obs,
   mutate(name = fct_relevel(name,"num_obs","num_obs_zisim")) %>% 
   ggplot(aes(x = value))+
   geom_histogram(aes(fill = name),
+                 color = "black",
                  position = "dodge", alpha = 0.8,
                  breaks = seq(0,15,1))+
   theme_bw(base_size = 13)+
   theme(aspect.ratio=0.8,
         axis.title.y = element_text(angle=0,vjust=0.5))+
   labs(x = "サルが観察された回数",
-       y = "度\n数") 
+       y = "度\n数") +
+  scale_fill_manual(values = c("grey","red3","black")) 
 ```
 
 検定をしても、ゼロ過剰は検出されない。

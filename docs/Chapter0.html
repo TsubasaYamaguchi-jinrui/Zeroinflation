@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>0 パッケージの読み込み | Zero-inflated model using R</title>
   <meta name="description" content="0 パッケージの読み込み | Zero-inflated model using R" />
-  <meta name="generator" content="bookdown 0.31 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
 
   <meta property="og:title" content="0 パッケージの読み込み | Zero-inflated model using R" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Tsubasa Yamaguchi" />
 
 
-<meta name="date" content="2023-06-01" />
+<meta name="date" content="2023-10-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -130,6 +130,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </style>
 
 <style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
 /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
 div.csl-bib-body { }
 div.csl-entry {
@@ -220,22 +224,23 @@ div.csl-indent {
 <h1>0 パッケージの読み込み<a href="Chapter0.html#パッケージの読み込み" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>本稿では、ゼロ過剰モデルの実行に<code>glmmTMB</code><a href="https://glmmtmb.github.io/glmmTMB/index.html">パッケージ</a>を用いる。<br />
 また、モデルチェックや結果の図示には<code>easystats</code><a href="https://easystats.github.io/easystats/">パッケージ</a>と<code>DHARMa</code><a href="https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html">パッケージ</a>、<code>ggeffects</code><a href="https://strengejacke.github.io/ggeffects/">パッケージ</a>も用いている。</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="Chapter0.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="Chapter0.html#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span>
-<span id="cb1-3"><a href="Chapter0.html#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(easystats)</span>
-<span id="cb1-4"><a href="Chapter0.html#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggeffects)</span>
-<span id="cb1-5"><a href="Chapter0.html#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmmTMB)</span>
-<span id="cb1-6"><a href="Chapter0.html#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statmod)</span>
-<span id="cb1-7"><a href="Chapter0.html#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DHARMa)</span>
-<span id="cb1-8"><a href="Chapter0.html#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
-<span id="cb1-9"><a href="Chapter0.html#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="Chapter0.html#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="Chapter0.html#cb1-2" tabindex="-1"></a><span class="fu">library</span>(lme4)</span>
+<span id="cb1-3"><a href="Chapter0.html#cb1-3" tabindex="-1"></a><span class="fu">library</span>(easystats)</span>
+<span id="cb1-4"><a href="Chapter0.html#cb1-4" tabindex="-1"></a><span class="fu">library</span>(ggeffects)</span>
+<span id="cb1-5"><a href="Chapter0.html#cb1-5" tabindex="-1"></a><span class="fu">library</span>(glmmTMB)</span>
+<span id="cb1-6"><a href="Chapter0.html#cb1-6" tabindex="-1"></a><span class="fu">library</span>(statmod)</span>
+<span id="cb1-7"><a href="Chapter0.html#cb1-7" tabindex="-1"></a><span class="fu">library</span>(DHARMa)</span>
+<span id="cb1-8"><a href="Chapter0.html#cb1-8" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
+<span id="cb1-9"><a href="Chapter0.html#cb1-9" tabindex="-1"></a><span class="fu">library</span>(ggsci)</span>
+<span id="cb1-10"><a href="Chapter0.html#cb1-10" tabindex="-1"></a><span class="fu">library</span>(DT)</span></code></pre></div>
 <p>なお、本稿はRの基本操作と<code>tidyverse</code>パッケージによるデータハンドリングができることを前提としている。<code>tidyverse</code>パッケージを用いたデータ処理については、以下の書籍などを参照。</p>
 <ul>
-<li><p>R for Data Science <span class="citation">(<a href="#ref-Wickham2016" role="doc-biblioref">Wickham &amp; Grolemund, 2016</a>)</span><br />
+<li><p>R for Data Science <span class="citation">(<a href="#ref-Wickham2016">Wickham &amp; Grolemund, 2016</a>)</span><br />
 <a href="https://r4ds.had.co.nz/">電子書籍</a>, <a href="https://www.oreilly.co.jp/books/9784873118147/">日本語</a></p></li>
-<li><p>R Graphics Coocbook 2nd Edition <span class="citation">(<a href="#ref-Chang2018" role="doc-biblioref">Chang, 2018</a>)</span><br />
+<li><p>R Graphics Coocbook 2nd Edition <span class="citation">(<a href="#ref-Chang2018">Chang, 2018</a>)</span><br />
 <a href="https://r-graphics.org/">電子書籍</a>, <a href="https://www.oreilly.co.jp/books/9784873118925/">日本語</a></p></li>
-<li><p>RユーザのためのRstudio[実践]入門~tidyverseによるモダンな分析フローの世界 改訂2版 <span class="citation">(<a href="#ref-Matsumura2021" role="doc-biblioref">松村 et al., 2021</a>)</span> <a href="https://gihyo.jp/book/2021/978-4-297-12170-9">出版社サイト</a></p></li>
+<li><p>RユーザのためのRstudio[実践]入門~tidyverseによるモダンな分析フローの世界 改訂2版 <span class="citation">(<a href="#ref-Matsumura2021">松村 et al., 2021</a>)</span> <a href="https://gihyo.jp/book/2021/978-4-297-12170-9">出版社サイト</a></p></li>
 </ul>
 
 </div>

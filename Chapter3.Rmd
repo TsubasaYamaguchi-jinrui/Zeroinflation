@@ -99,6 +99,7 @@ data.frame(prop_inj = num_inj/dat_zibinom$sum,
   pivot_longer(cols = 1:2) %>% 
   ggplot(aes(x = value))+
   geom_histogram(aes(fill = name),
+                 color = "black",
                  position = "dodge", alpha = 0.8,
                  breaks = seq(0,0.2,by=0.01))+
   theme_bw(base_size = 13)+
@@ -106,7 +107,8 @@ data.frame(prop_inj = num_inj/dat_zibinom$sum,
         axis.title.y = element_text(angle=0,vjust=0.5))+
   labs(x = "怪我が確認された割合",
        y = "度\n数")+
-  coord_cartesian(xlim = c(0,0.13))-> p_binom_hist
+  coord_cartesian(xlim = c(0,0.13))+
+  scale_fill_manual(values = c("grey","black"))-> p_binom_hist
 
 p_binom_hist
 ```
@@ -246,13 +248,15 @@ prop_inj_zisim <- num_inj_zisim/dat_zibinom$sum
   pivot_longer(cols = 1:2) %>% 
   ggplot(aes(x = value))+
   geom_histogram(aes(fill = name),
+                 color = "black",
                  position = "dodge", alpha = 0.8,
                  breaks = seq(0,0.13,0.01))+
   theme_bw(base_size = 13)+
   theme(aspect.ratio=0.8,
         axis.title.y = element_text(angle=0,vjust=0.5))+
   labs(x = "怪我が確認された割合",
-       y = "度\n数") -> p_zibinom_hist
+       y = "度\n数") +
+  scale_fill_manual(values = c("grey","red3")) -> p_zibinom_hist
 
 p_zibinom_hist
 ```
@@ -272,7 +276,8 @@ data.frame(prop_inj = dat_zibinom$num_inj/dat_zibinom$sum,
   theme(aspect.ratio=0.8,
         axis.title.y = element_text(angle=0,vjust=0.5))+
   labs(x = "怪我が確認された割合",
-       y = "度\n数") 
+       y = "度\n数") +
+  scale_fill_manual(values = c("grey","red3","black")) 
 ```
 
 検定をしても、ゼロ過剰は検出されない。
@@ -470,6 +475,7 @@ data.frame(prop_inj = num_inj/dat_zibinom_glmm$sum,
   pivot_longer(cols = 1:2) %>% 
   ggplot(aes(x = value))+
   geom_histogram(aes(fill = name),
+                 color = "black",
                  position = "dodge", alpha = 0.8,
                  breaks = seq(0,0.2,by=0.01))+
   theme_bw(base_size = 13)+
@@ -477,7 +483,8 @@ data.frame(prop_inj = num_inj/dat_zibinom_glmm$sum,
         axis.title.y = element_text(angle=0,vjust=0.5))+
   labs(x = "怪我が確認された割合",
        y = "度\n数")+
-  coord_cartesian(xlim = c(0,0.13))-> p_binom_hist
+  coord_cartesian(xlim = c(0,0.13))+
+  scale_fill_manual(values = c("grey","black"))  -> p_binom_hist
 
 p_binom_hist
 ```
@@ -557,13 +564,15 @@ prop_inj_zisim_glmm <- num_inj_zisim_glmm/dat_zibinom_glmm$sum
   pivot_longer(cols = 1:2) %>% 
   ggplot(aes(x = value))+
   geom_histogram(aes(fill = name),
+                 color = "black",
                  position = "dodge", alpha = 0.8,
                  breaks = seq(0,0.13,0.01))+
   theme_bw(base_size = 13)+
   theme(aspect.ratio=0.8,
         axis.title.y = element_text(angle=0,vjust=0.5))+
   labs(x = "怪我が確認された割合",
-       y = "度\n数") -> p_zibinom_glmm_hist
+       y = "度\n数")+
+  scale_fill_manual(values = c("grey","red3")) -> p_zibinom_glmm_hist
 
 p_zibinom_glmm_hist
 ```
