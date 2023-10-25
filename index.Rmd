@@ -29,7 +29,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE,
 ```
 
 # 本稿の目的 {-}   
-本稿は主に一般化線形モデルで用いられることが多い**ゼロ過剰モデル(zero-inflated model)**と呼ばれる手法の概要とRでの実装をまとめたものである。    
+本稿は一般化線形モデルで用いられることが多い**ゼロ過剰モデル(zero-inflated model)**と呼ばれる手法の概要とRでの実装をまとめたものである。今回は、ゼロ過剰ポワソン/二項モデルについて解説した。      
 
 本稿が主に参考にしたのは参考にしたのは @Rhodes2015 や @Matsuura2016 などである。  
 なお、本稿の作成に使用したファイルとRのコードは筆者の[Github](https://github.com/TsubasaYamaguchi-jinrui/Zeroinflation)ですべて閲覧できる。    
