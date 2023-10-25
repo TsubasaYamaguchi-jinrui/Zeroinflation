@@ -330,8 +330,8 @@ x_i &amp;\sim Binomial(n_i, p_i)
 \]</span></p>
 <p>RでGLMを実行するコードは以下のようになる。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="Chapter1.html#cb6-1" tabindex="-1"></a>r_binom_sample <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="at">data =</span> dat_binom,</span>
-<span id="cb6-2"><a href="Chapter1.html#cb6-2" tabindex="-1"></a>               <span class="fu">cbind</span>(x, n<span class="sc">-</span>x) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb6-3"><a href="Chapter1.html#cb6-3" tabindex="-1"></a>               <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
+<span id="cb6-2"><a href="Chapter1.html#cb6-2" tabindex="-1"></a>                      <span class="fu">cbind</span>(x, n<span class="sc">-</span>x) <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb6-3"><a href="Chapter1.html#cb6-3" tabindex="-1"></a>                      <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
 <p>結果は以下のようになる。推定されたパラメータ<span class="math inline">\(\beta\)</span>は0.298である。</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="Chapter1.html#cb7-1" tabindex="-1"></a>r_binom_sample</span></code></pre></div>
 <pre><code>## 
@@ -353,11 +353,11 @@ x_i &amp;\sim Binomial(n_i, p_i)
 <pre><code>## [1] 3.498163</code></pre>
 <p>GLM(M)において、過分散が生じているかはdispersion parameter (<span class="math inline">\(\phi\)</span>)が既定の値(ポワソン分布や二項分布では1)よりも大きいかで調べられる。</p>
 <p>dispersion parameter (<span class="math inline">\(\phi\)</span>)は以下の式で算出される。<br />
-なお、<span class="math inline">\(y_i\)</span>は応答変数の値、<span class="math inline">\(\mu_i\)</span>はモデルから推定されたi番目の期待値(平均値)、<span class="math inline">\(\sigma_i\)</span>はモデルから推定されたi番目の分散を表す。また、残差自由度は全自由度(データ数)からモデルで推定されたパラメータ数(今回は<span class="math inline">\(\lambda\)</span>の1つ)を引いたものである(つまり、今回は199)。</p>
+なお、<span class="math inline">\(N\)</span>はデータ数、<span class="math inline">\(y_i\)</span>は応答変数の値、<span class="math inline">\(\mu_i\)</span>はモデルから推定されたi番目の期待値(平均値)、<span class="math inline">\(\sigma_i\)</span>はモデルから推定されたi番目の分散を表す。また、残差自由度は全自由度(データ数)からモデルで推定されたパラメータ数(今回は<span class="math inline">\(\lambda\)</span>の1つ)を引いたものである(つまり、今回は49)。</p>
 <p><span class="math display">\[
 \begin{aligned}
-\phi &amp;= \frac{ピアソン残差^2}{残差自由度}\\
-     &amp;= \frac{y_i-\mu_i/
+\phi &amp;= \frac{ピアソン残差の平方和}{残差自由度}\\
+     &amp;= \frac{\Sigma_{i=1}^N(y_i-\mu_i)^2/
      \sigma_i}{残差自由度}
 \end{aligned}
 \]</span></p>
